@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.mapper.StoragePlanMapper">
+
+    <resultMap id="BaseResultMap" type="com.app.pojo.entity.StoragePlanEntity">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="plan_code" jdbcType="VARCHAR" property="planCode"/>
+        <result column="plan_version" jdbcType="INTEGER" property="planVersion"/>
+        <result column="plan_name" jdbcType="VARCHAR" property="planName"/>
+        <result column="capacity_bytes" jdbcType="BIGINT" property="capacityBytes"/>
+        <result column="duration_value" jdbcType="INTEGER" property="durationValue"/>
+        <result column="duration_unit" jdbcType="VARCHAR" property="durationUnit"/>
+        <result column="price_cent" jdbcType="BIGINT" property="priceCent"/>
+        <result column="currency" jdbcType="VARCHAR" property="currency"/>
+        <result column="sort_order" jdbcType="INTEGER" property="sortOrder"/>
+        <result column="recommended" jdbcType="TINYINT" property="recommended"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="effective_time" jdbcType="TIMESTAMP" property="effectiveTime"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ct.id, ct.plan_code, ct.plan_version, ct.plan_name, ct.capacity_bytes, ct.duration_value, ct.duration_unit, ct.price_cent, ct.currency, ct.sort_order, ct.recommended, ct.status, ct.effective_time, ct.create_by, ct.create_time, ct.update_by, ct.update_time
+    </sql>
+
+    <select id="selectActivePlan" resultMap="BaseResultMap">
+        SELECT * FROM t_storage_plan WHERE plan_code = #{planCode} AND plan_version = #{planVersion} AND status = 'ACTIVE' AND effective_time IS NOT NULL AND effective_time &lt;= #{now} LIMIT 1
+    </select>
+
+    <select id="selectActivePlans" resultMap="BaseResultMap">
+        SELECT * FROM t_storage_plan WHERE status = 'ACTIVE' AND effective_time IS NOT NULL AND effective_time &lt;= #{now} ORDER BY sort_order ASC, id ASC
+    </select>
+
+</mapper>

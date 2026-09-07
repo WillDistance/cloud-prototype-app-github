@@ -1,0 +1,5 @@
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'; import { useRouter } from 'vue-router'; import { storageApi, type Entitlement } from '@/api'; import { showToast } from 'vant'
+const router=useRouter(); const items=ref<Entitlement[]>([]); onMounted(async()=>{try{items.value=(await storageApi.entitlements()).data.data||[]}catch{showToast('权益加载失败')}})
+</script>
+<template><main class="page-shell"><header class="page-header"><button @click="router.back()">‹</button><b>存储权益</b></header><p class="muted summary">当前有效存储权益明细</p><section v-if="items.length" class="entitlements"><article v-for="item in items" :key="item.entitlementNo" class="card"><div class="row"><h3>{{item.nameSnapshot}}</h3><span class="badge">有效</span></div><p>{{item.sourceType}} · {{item.capacityBytes}} 字节</p><small>生效：{{item.effectiveTime}}<br>到期：{{item.expireTime}}</small></article></section><section v-else class="empty-state"><h2>暂无存储权益</h2><p>绑定设备或购买套餐后可获得存储空间。</p></section><van-button type="primary" block round @click="router.push('/plans')">购买 / 续费容量</van-button></main></template>

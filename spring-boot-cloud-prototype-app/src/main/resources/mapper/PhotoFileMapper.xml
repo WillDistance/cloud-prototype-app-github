@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.mapper.PhotoFileMapper">
+
+    <resultMap id="BaseResultMap" type="com.app.pojo.entity.PhotoFileEntity">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="photo_id" jdbcType="BIGINT" property="photoId"/>
+        <result column="file_type" jdbcType="VARCHAR" property="fileType"/>
+        <result column="object_key" jdbcType="VARCHAR" property="objectKey"/>
+        <result column="mime_type" jdbcType="VARCHAR" property="mimeType"/>
+        <result column="size_bytes" jdbcType="BIGINT" property="sizeBytes"/>
+        <result column="sha256" jdbcType="VARCHAR" property="sha256"/>
+        <result column="width_pixels" jdbcType="INTEGER" property="widthPixels"/>
+        <result column="height_pixels" jdbcType="INTEGER" property="heightPixels"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="delete_reason" jdbcType="VARCHAR" property="deleteReason"/>
+        <result column="oss_callback_event_id" jdbcType="VARCHAR" property="ossCallbackEventId"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ct.id, ct.photo_id, ct.file_type, ct.object_key, ct.mime_type, ct.size_bytes, ct.sha256, ct.width_pixels, ct.height_pixels, ct.status, ct.delete_reason, ct.oss_callback_event_id, ct.create_by, ct.create_time, ct.update_by, ct.update_time
+    </sql>
+
+</mapper>

@@ -1,0 +1,74 @@
+{
+  "info": {
+    "_postman_id": "44c9d249-ef40-4c45-9f34-b62d3254be31",
+    "name": "UserController",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8081/app"},
+    {"key": "accessToken", "value": ""}
+  ],
+  "item": [
+    {
+      "name": "getProfile",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+        "url": "{{baseUrl}}/api/user/getProfile"
+      },
+      "response": []
+    },
+    {
+      "name": "updateLanguage - zh-CN",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{accessToken}}"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {"mode": "raw", "raw": "{\n  \"language\": \"zh-CN\"\n}", "options": {"raw": {"language": "json"}}},
+        "url": "{{baseUrl}}/api/user/updateLanguage"
+      },
+      "response": []
+    },
+    {
+      "name": "updateLanguage - en",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{accessToken}}"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {"mode": "raw", "raw": "{\n  \"language\": \"en\"\n}", "options": {"raw": {"language": "json"}}},
+        "url": "{{baseUrl}}/api/user/updateLanguage"
+      },
+      "response": []
+    },
+    {
+      "name": "updateLanguage - de",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{accessToken}}"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {"mode": "raw", "raw": "{\n  \"language\": \"de\"\n}", "options": {"raw": {"language": "json"}}},
+        "url": "{{baseUrl}}/api/user/updateLanguage"
+      },
+      "response": []
+    },
+    {
+      "name": "updateLanguage - unsupported language",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{accessToken}}"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {"mode": "raw", "raw": "{\n  \"language\": \"fr\"\n}", "options": {"raw": {"language": "json"}}},
+        "url": "{{baseUrl}}/api/user/updateLanguage"
+      },
+      "response": []
+    }
+  ]
+}

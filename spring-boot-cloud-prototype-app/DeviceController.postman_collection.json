@@ -1,0 +1,41 @@
+{
+  "info": {
+    "_postman_id": "1799daf5-eeda-4782-8a09-a48cb97eb9e4",
+    "name": "DeviceController",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8081/app"},
+    {"key": "accessToken", "value": ""}
+  ],
+  "item": [
+    {
+      "name": "getMyDevice",
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+        ],
+        "url": "{{baseUrl}}/api/device/getMyDevice"
+      },
+      "response": []
+    },
+    {
+      "name": "bindDevice",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{accessToken}}"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"deviceId\": \"CC-2026-AB12-8A2F\",\n  \"password\": \"CAMERA123\"\n}",
+          "options": {"raw": {"language": "json"}}
+        },
+        "url": "{{baseUrl}}/api/device/bindDevice"
+      },
+      "response": []
+    }
+  ]
+}

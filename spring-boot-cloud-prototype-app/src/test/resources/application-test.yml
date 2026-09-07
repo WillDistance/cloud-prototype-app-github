@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${TEST_DB_URL:jdbc:mysql://localhost:3306/app?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC}
+    username: ${TEST_DB_USERNAME:root}
+    password: ${TEST_DB_PASSWORD}
+  data:
+    redis:
+      host: ${TEST_REDIS_HOST:127.0.0.1}
+      port: ${TEST_REDIS_PORT:6379}
+      password: ${TEST_REDIS_PASSWORD}
+      database: ${TEST_REDIS_DATABASE:0}
+      timeout: 30s
+
+logging:
+  pattern:
+    dateformat: yyyy-MM-dd'T'HH:mm:ss.SSSXXX,UTC
+
+security:
+  jwt:
+    secret: test-only-secret-with-at-least-thirty-two-bytes
+    ttl: PT2H

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.mapper.UserStorageAccountMapper">
+
+    <resultMap id="BaseResultMap" type="com.app.pojo.entity.UserStorageAccountEntity">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="used_bytes" jdbcType="BIGINT" property="usedBytes"/>
+        <result column="reserved_bytes" jdbcType="BIGINT" property="reservedBytes"/>
+        <result column="lock_version" jdbcType="BIGINT" property="lockVersion"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ct.id, ct.user_id, ct.used_bytes, ct.reserved_bytes, ct.lock_version, ct.create_by, ct.create_time, ct.update_by, ct.update_time
+    </sql>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT * FROM t_user_storage_account WHERE user_id = #{userId} LIMIT 1
+    </select>
+
+    <select id="selectByUserIdForUpdate" resultMap="BaseResultMap">
+        SELECT * FROM t_user_storage_account WHERE user_id = #{userId} LIMIT 1 FOR UPDATE
+    </select>
+
+    <update id="increaseReservedBytes">
+        UPDATE t_user_storage_account SET reserved_bytes = reserved_bytes + #{bytes}, lock_version = lock_version + 1, update_time = UTC_TIMESTAMP(3) WHERE user_id = #{userId}
+    </update>
+
+    <update id="decreaseReservedBytes">
+        UPDATE t_user_storage_account SET reserved_bytes = reserved_bytes - #{bytes}, lock_version = lock_version + 1, update_time = UTC_TIMESTAMP(3) WHERE user_id = #{userId} AND reserved_bytes >= #{bytes}
+    </update>
+
+    <update id="moveReservedToUsed">
+        UPDATE t_user_storage_account SET reserved_bytes = reserved_bytes - #{reservedBytes}, used_bytes = used_bytes + #{usedBytes}, lock_version = lock_version + 1, update_time = UTC_TIMESTAMP(3) WHERE user_id = #{userId} AND reserved_bytes >= #{reservedBytes}
+    </update>
+
+    <update id="decreaseUsedBytes">
+        UPDATE t_user_storage_account SET used_bytes = used_bytes - #{bytes}, lock_version = lock_version + 1, update_time = UTC_TIMESTAMP(3) WHERE user_id = #{userId} AND used_bytes >= #{bytes}
+    </update>
+
+</mapper>

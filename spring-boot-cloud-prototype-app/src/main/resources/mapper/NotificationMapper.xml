@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.mapper.NotificationMapper">
+
+    <resultMap id="BaseResultMap" type="com.app.pojo.entity.NotificationEntity">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="notification_no" jdbcType="VARCHAR" property="notificationNo"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="notification_type" jdbcType="VARCHAR" property="notificationType"/>
+        <result column="language_code" jdbcType="VARCHAR" property="languageCode"/>
+        <result column="channel" jdbcType="VARCHAR" property="channel"/>
+        <result column="recipient" jdbcType="VARCHAR" property="recipient"/>
+        <result column="subject" jdbcType="VARCHAR" property="subject"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="business_type" jdbcType="VARCHAR" property="businessType"/>
+        <result column="business_id" jdbcType="BIGINT" property="businessId"/>
+        <result column="idempotency_key" jdbcType="VARCHAR" property="idempotencyKey"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="retry_count" jdbcType="INTEGER" property="retryCount"/>
+        <result column="next_retry_time" jdbcType="TIMESTAMP" property="nextRetryTime"/>
+        <result column="sent_time" jdbcType="TIMESTAMP" property="sentTime"/>
+        <result column="failure_reason" jdbcType="VARCHAR" property="failureReason"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ct.id, ct.notification_no, ct.user_id, ct.notification_type, ct.language_code, ct.channel, ct.recipient, ct.subject, ct.content, ct.business_type, ct.business_id, ct.idempotency_key, ct.status, ct.retry_count, ct.next_retry_time, ct.sent_time, ct.failure_reason, ct.create_by, ct.create_time, ct.update_by, ct.update_time
+    </sql>
+
+</mapper>

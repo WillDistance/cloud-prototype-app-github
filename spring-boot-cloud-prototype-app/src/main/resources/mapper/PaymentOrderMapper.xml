@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.mapper.PaymentOrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.app.pojo.entity.PaymentOrderEntity">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="order_no" jdbcType="VARCHAR" property="orderNo"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="storage_plan_id" jdbcType="BIGINT" property="storagePlanId"/>
+        <result column="plan_code_snapshot" jdbcType="VARCHAR" property="planCodeSnapshot"/>
+        <result column="plan_version_snapshot" jdbcType="INTEGER" property="planVersionSnapshot"/>
+        <result column="plan_name_snapshot" jdbcType="VARCHAR" property="planNameSnapshot"/>
+        <result column="capacity_bytes_snapshot" jdbcType="BIGINT" property="capacityBytesSnapshot"/>
+        <result column="duration_value_snapshot" jdbcType="INTEGER" property="durationValueSnapshot"/>
+        <result column="duration_unit_snapshot" jdbcType="VARCHAR" property="durationUnitSnapshot"/>
+        <result column="amount_cent" jdbcType="BIGINT" property="amountCent"/>
+        <result column="currency" jdbcType="VARCHAR" property="currency"/>
+        <result column="payment_channel" jdbcType="VARCHAR" property="paymentChannel"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="expire_time" jdbcType="TIMESTAMP" property="expireTime"/>
+        <result column="paid_time" jdbcType="TIMESTAMP" property="paidTime"/>
+        <result column="closed_time" jdbcType="TIMESTAMP" property="closedTime"/>
+        <result column="client_request_id" jdbcType="VARCHAR" property="clientRequestId"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ct.id, ct.order_no, ct.user_id, ct.storage_plan_id, ct.plan_code_snapshot, ct.plan_version_snapshot, ct.plan_name_snapshot, ct.capacity_bytes_snapshot, ct.duration_value_snapshot, ct.duration_unit_snapshot, ct.amount_cent, ct.currency, ct.payment_channel, ct.status, ct.expire_time, ct.paid_time, ct.closed_time, ct.client_request_id, ct.create_by, ct.create_time, ct.update_by, ct.update_time
+    </sql>
+
+    <select id="selectByUserAndClientRequestId" resultMap="BaseResultMap">
+        SELECT * FROM t_payment_order WHERE user_id = #{userId} AND client_request_id = #{clientRequestId} LIMIT 1
+    </select>
+
+    <select id="selectByUserAndOrderNo" resultMap="BaseResultMap">
+        SELECT * FROM t_payment_order WHERE user_id = #{userId} AND order_no = #{orderNo} LIMIT 1
+    </select>
+
+</mapper>

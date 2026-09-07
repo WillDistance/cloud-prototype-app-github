@@ -1,0 +1,33 @@
+server:
+  port: ${SERVER_PORT:8081}
+  servlet:
+    context-path: /app
+
+spring:
+  application:
+    name: spring-boot-cloud-prototype-app
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  jackson:
+    time-zone: UTC
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSS'Z'
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 打印SQL日志
+
+security:
+  jwt:
+    secret: ${JWT_SECRET:346d8179-bd86-405c-a9a5-69e66a6a9ff7}
+    ttl: ${JWT_TTL:PT2H}
+
+oss:
+  endpoint: ${OSS_ENDPOINT:https://oss-cn-shenzhen.aliyuncs.com}
+  region: ${OSS_REGION:cn-shenzhen}
+  access-key-id: ${OSS_ACCESS_KEY_ID}
+  access-key-secret: ${OSS_ACCESS_KEY_SECRET}
+  bucket: ${OSS_BUCKET:yl-img-bucket}
+  callback-url: ${OSS_CALLBACK_URL:}
+  callback-test-signature: ${OSS_CALLBACK_TEST_SIGNATURE:local-callback-signature}

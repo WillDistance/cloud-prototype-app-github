@@ -1,0 +1,49 @@
+{
+  "info": {
+    "_postman_id": "4dcfa095-6f42-4f56-83cc-photo-controller",
+    "name": "PhotoController",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8081/app"},
+    {"key": "accessToken", "value": ""},
+    {"key": "photoNo", "value": "PHO202609060001"},
+    {"key": "cursorTime", "value": "2026-09-06T01:02:03Z"},
+    {"key": "cursorId", "value": "100"}
+  ],
+  "item": [
+    {
+      "name": "listPhotos",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}", "type": "text"}],
+        "url": {"raw": "{{baseUrl}}/api/photo/listPhotos?filter=TODAY&size=20", "host": ["{{baseUrl}}"], "path": ["api", "photo", "listPhotos"], "query": [{"key": "filter", "value": "TODAY"}, {"key": "cursorTime", "value": "{{cursorTime}}", "disabled": true}, {"key": "cursorId", "value": "{{cursorId}}", "disabled": true}, {"key": "size", "value": "20"}]}
+      }
+    },
+    {
+      "name": "getPhotoDetail",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}", "type": "text"}],
+        "url": {"raw": "{{baseUrl}}/api/photo/getPhotoDetail?photoNo={{photoNo}}", "host": ["{{baseUrl}}"], "path": ["api", "photo", "getPhotoDetail"], "query": [{"key": "photoNo", "value": "{{photoNo}}"}]}
+      }
+    },
+    {
+      "name": "getOriginalDownloadUrl",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}", "type": "text"}],
+        "url": {"raw": "{{baseUrl}}/api/photo/getOriginalDownloadUrl?photoNo={{photoNo}}", "host": ["{{baseUrl}}"], "path": ["api", "photo", "getOriginalDownloadUrl"], "query": [{"key": "photoNo", "value": "{{photoNo}}"}]}
+      }
+    },
+    {
+      "name": "deletePhotos",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}", "type": "text"}, {"key": "Content-Type", "value": "application/json", "type": "text"}],
+        "body": {"mode": "raw", "raw": "{\n  \"photoNos\": [\"{{photoNo}}\"]\n}", "options": {"raw": {"language": "json"}}},
+        "url": {"raw": "{{baseUrl}}/api/photo/deletePhotos", "host": ["{{baseUrl}}"], "path": ["api", "photo", "deletePhotos"]}
+      }
+    }
+  ]
+}

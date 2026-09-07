@@ -1,0 +1,6 @@
+<script setup lang="ts">
+import { ref } from 'vue'; import { useRouter } from 'vue-router'; import { showToast } from 'vant'; import { useAppStore } from '@/stores/app'
+const router=useRouter(); const store=useAppStore(); const deviceId=ref(''); const password=ref(''); const loading=ref(false)
+async function bind(){if(!/^CC-\d{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(deviceId.value))return showToast('设备 ID 格式错误');loading.value=true;try{await store.bindDevice(deviceId.value,password.value);showToast('绑定成功');router.push('/mine')}catch{showToast('设备 ID 或密码错误')}finally{loading.value=false}}
+</script>
+<template><main class="page-shell"><header class="page-header"><button @click="router.back()">‹</button><b>我的设备</b></header><section v-if="store.device" class="card"><h2>{{store.device.model}}</h2><p>设备 ID：{{store.device.deviceId}}</p><p>状态：{{store.device.status}}</p></section><section v-else class="card"><h2>绑定你的云端相机</h2><p class="muted">绑定后才能接收设备上传的照片，并获得平台赠送的存储权益。</p><van-field v-model="deviceId" label="设备 ID" placeholder="CC-2026-AB12-8A2F" inset/><van-field v-model="password" label="初始绑定密码" type="password" placeholder="设备购买时附带" inset/><van-button type="primary" block round :loading="loading" @click="bind">提交校验并绑定</van-button></section></main></template>

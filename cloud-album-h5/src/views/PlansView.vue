@@ -1,0 +1,7 @@
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'; import { useRouter } from 'vue-router'; import { showToast } from 'vant'; import { storageApi, type StoragePlan } from '@/api'; import { useAppStore } from '@/stores/app'; import api from '@/api/http'
+const router=useRouter(); const store=useAppStore(); const plans=ref<StoragePlan[]>([]); const selected=ref<StoragePlan|null>(null); const loading=ref(false)
+onMounted(async()=>{try{plans.value=(await storageApi.plans()).data.data||[]}catch{showToast('套餐加载失败')}})
+async function create(){if(!selected.value)return;loading.value=true;try{const r=await api.post('/api/paymentOrder/createOrder',{planCode:selected.value.planCode,planVersion:selected.value.planVersion,clientRequestId:crypto.randomUUID()});showToast(r.data.data.paymentRedirectUrl?'订单已创建':'订单创建成功')}catch{showToast('订单创建失败')}finally{loading.value=false}}
+</script>
+<template><main class="page-shell"><header class="page-header"><button @click="router.back()">‹</button><b>容量购买</b></header><p class="muted summary">新购容量会与现有有效权益叠加。</p><section class="plans"><button v-for="plan in plans" :key="`${plan.planCode}-${plan.planVersion}`" class="card plan" :class="{selected:selected===plan}" @click="selected=plan"><span><b>{{plan.planName}}</b><small>{{plan.capacityBytes}} 字节 · {{plan.durationValue}} {{plan.durationUnit}}</small></span><strong>¥{{(plan.priceCent/100).toFixed(2)}}</strong></button></section><van-button type="primary" block round :disabled="!selected" :loading="loading" @click="create">创建订单</van-button></main></template>

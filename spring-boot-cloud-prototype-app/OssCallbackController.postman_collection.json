@@ -1,0 +1,24 @@
+{
+  "info": {
+    "name": "OssCallbackController",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8081/app"},
+    {"key": "callbackSignature", "value": "local-callback-signature"}
+  ],
+  "item": [
+    {
+      "name": "uploadCompleted",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"eventId\": \"evt-test-001\",\n  \"uploadNo\": \"UPL202609060001\",\n  \"objectKey\": \"users/7/devices/3/original/2026/09/test.jpg\",\n  \"sizeBytes\": 200,\n  \"contentType\": \"image/jpeg\",\n  \"signature\": \"{{callbackSignature}}\",\n  \"callbackTime\": \"2026-09-06T09:00:00Z\"\n}"
+        },
+        "url": "{{baseUrl}}/api/ossCallback/uploadCompleted"
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.mapper.PlatformConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.app.pojo.entity.PlatformConfigEntity">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="config_version" jdbcType="VARCHAR" property="configVersion"/>
+        <result column="max_file_size_bytes" jdbcType="BIGINT" property="maxFileSizeBytes"/>
+        <result column="allowed_extensions" jdbcType="VARCHAR" property="allowedExtensions" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result column="allowed_mime_types" jdbcType="VARCHAR" property="allowedMimeTypes" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result column="device_gift_capacity_bytes" jdbcType="BIGINT" property="deviceGiftCapacityBytes"/>
+        <result column="device_gift_duration_value" jdbcType="INTEGER" property="deviceGiftDurationValue"/>
+        <result column="device_gift_duration_unit" jdbcType="VARCHAR" property="deviceGiftDurationUnit"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="effective_time" jdbcType="TIMESTAMP" property="effectiveTime"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ct.id, ct.config_version, ct.max_file_size_bytes, ct.allowed_extensions, ct.allowed_mime_types, ct.device_gift_capacity_bytes, ct.device_gift_duration_value, ct.device_gift_duration_unit, ct.status, ct.effective_time, ct.create_by, ct.create_time, ct.update_by, ct.update_time
+    </sql>
+
+    <select id="selectCurrentActive" resultMap="BaseResultMap">
+        SELECT * FROM t_platform_config WHERE status = 'ACTIVE' AND effective_time IS NOT NULL AND effective_time &lt;= #{now} ORDER BY effective_time DESC, id DESC LIMIT 1
+    </select>
+
+</mapper>

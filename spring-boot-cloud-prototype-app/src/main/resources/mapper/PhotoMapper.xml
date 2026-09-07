@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.mapper.PhotoMapper">
+
+    <resultMap id="BaseResultMap" type="com.app.pojo.entity.PhotoEntity">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="photo_no" jdbcType="VARCHAR" property="photoNo"/>
+        <result column="upload_session_id" jdbcType="BIGINT" property="uploadSessionId"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="device_id" jdbcType="BIGINT" property="deviceId"/>
+        <result column="device_binding_id" jdbcType="BIGINT" property="deviceBindingId"/>
+        <result column="file_name" jdbcType="VARCHAR" property="fileName"/>
+        <result column="original_extension" jdbcType="VARCHAR" property="originalExtension"/>
+        <result column="original_mime_type" jdbcType="VARCHAR" property="originalMimeType"/>
+        <result column="original_size_bytes" jdbcType="BIGINT" property="originalSizeBytes"/>
+        <result column="original_sha256" jdbcType="VARCHAR" property="originalSha256"/>
+        <result column="width_pixels" jdbcType="INTEGER" property="widthPixels"/>
+        <result column="height_pixels" jdbcType="INTEGER" property="heightPixels"/>
+        <result column="taken_time" jdbcType="TIMESTAMP" property="takenTime"/>
+        <result column="uploaded_time" jdbcType="TIMESTAMP" property="uploadedTime"/>
+        <result column="user_time_zone_snapshot" jdbcType="VARCHAR" property="userTimeZoneSnapshot"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ct.id, ct.photo_no, ct.upload_session_id, ct.user_id, ct.device_id, ct.device_binding_id, ct.file_name, ct.original_extension, ct.original_mime_type, ct.original_size_bytes, ct.original_sha256, ct.width_pixels, ct.height_pixels, ct.taken_time, ct.uploaded_time, ct.user_time_zone_snapshot, ct.status, ct.create_by, ct.create_time, ct.update_by, ct.update_time
+    </sql>
+
+    <select id="selectByUploadSessionId" resultMap="BaseResultMap">
+        SELECT * FROM t_photo WHERE upload_session_id = #{uploadSessionId} LIMIT 1
+    </select>
+
+</mapper>

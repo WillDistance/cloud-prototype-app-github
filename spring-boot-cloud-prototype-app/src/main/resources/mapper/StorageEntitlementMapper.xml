@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.mapper.StorageEntitlementMapper">
+
+    <resultMap id="BaseResultMap" type="com.app.pojo.entity.StorageEntitlementEntity">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="entitlement_no" jdbcType="VARCHAR" property="entitlementNo"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="source_type" jdbcType="VARCHAR" property="sourceType"/>
+        <result column="device_binding_id" jdbcType="BIGINT" property="deviceBindingId"/>
+        <result column="payment_order_id" jdbcType="BIGINT" property="paymentOrderId"/>
+        <result column="name_snapshot" jdbcType="VARCHAR" property="nameSnapshot"/>
+        <result column="capacity_bytes" jdbcType="BIGINT" property="capacityBytes"/>
+        <result column="duration_value" jdbcType="INTEGER" property="durationValue"/>
+        <result column="duration_unit" jdbcType="VARCHAR" property="durationUnit"/>
+        <result column="user_time_zone_snapshot" jdbcType="VARCHAR" property="userTimeZoneSnapshot"/>
+        <result column="effective_time" jdbcType="TIMESTAMP" property="effectiveTime"/>
+        <result column="expire_time" jdbcType="TIMESTAMP" property="expireTime"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="expired_processed_time" jdbcType="TIMESTAMP" property="expiredProcessedTime"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ct.id, ct.entitlement_no, ct.user_id, ct.source_type, ct.device_binding_id, ct.payment_order_id, ct.name_snapshot, ct.capacity_bytes, ct.duration_value, ct.duration_unit, ct.user_time_zone_snapshot, ct.effective_time, ct.expire_time, ct.status, ct.expired_processed_time, ct.create_by, ct.create_time, ct.update_by, ct.update_time
+    </sql>
+
+    <select id="selectPendingExpiration" resultMap="BaseResultMap">
+        SELECT * FROM t_storage_entitlement WHERE status = 'ACTIVE' AND expire_time &lt;= #{now} AND expired_processed_time IS NULL ORDER BY expire_time ASC, id ASC LIMIT #{limit}
+    </select>
+
+    <select id="selectEffectiveByUserId" resultMap="BaseResultMap">
+        SELECT * FROM t_storage_entitlement WHERE user_id = #{userId} AND status = 'ACTIVE' AND effective_time &lt;= #{now} AND expire_time > #{now} ORDER BY expire_time ASC, id ASC
+    </select>
+
+    <select id="sumActiveCapacity" resultType="java.lang.Long">
+        SELECT COALESCE(SUM(capacity_bytes), 0) FROM t_storage_entitlement WHERE user_id = #{userId} AND status = 'ACTIVE' AND effective_time &lt;= #{now} AND expire_time > #{now}
+    </select>
+
+    <update id="markExpiredProcessed">
+        UPDATE t_storage_entitlement SET status = 'EXPIRED', expired_processed_time = #{processedTime}, update_time = UTC_TIMESTAMP(3) WHERE id = #{id} AND status = 'ACTIVE' AND expired_processed_time IS NULL
+    </update>
+
+</mapper>

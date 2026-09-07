@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.mapper.DeviceBindingMapper">
+
+    <resultMap id="BaseResultMap" type="com.app.pojo.entity.DeviceBindingEntity">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="device_id" jdbcType="BIGINT" property="deviceId"/>
+        <result column="bind_time" jdbcType="TIMESTAMP" property="bindTime"/>
+        <result column="bind_user_time_zone" jdbcType="VARCHAR" property="bindUserTimeZone"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ct.id, ct.user_id, ct.device_id, ct.bind_time, ct.bind_user_time_zone, ct.status, ct.create_by, ct.create_time, ct.update_by, ct.update_time
+    </sql>
+
+    <resultMap id="UserResultMap" type="com.app.pojo.entity.UserEntity">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="password_hash" jdbcType="VARCHAR" property="passwordHash"/>
+        <result column="password_algorithm" jdbcType="VARCHAR" property="passwordAlgorithm"/>
+        <result column="time_zone" jdbcType="VARCHAR" property="timeZone"/>
+        <result column="preferred_language" jdbcType="VARCHAR" property="preferredLanguage"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="last_login_time" jdbcType="TIMESTAMP" property="lastLoginTime"/>
+        <result column="password_update_time" jdbcType="TIMESTAMP" property="passwordUpdateTime"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <select id="selectUserForUpdate" resultMap="UserResultMap">
+        SELECT * FROM t_user WHERE id = #{userId} LIMIT 1 FOR UPDATE
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT * FROM t_device_binding WHERE user_id = #{userId} LIMIT 1
+    </select>
+
+    <select id="selectByDeviceId" resultMap="BaseResultMap">
+        SELECT * FROM t_device_binding WHERE device_id = #{deviceId} LIMIT 1
+    </select>
+
+</mapper>
