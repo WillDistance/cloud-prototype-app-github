@@ -41,9 +41,15 @@ public class RateLimitInterceptor implements HandlerInterceptor {
      * @return 处理结果
      */
     private String category(String uri) {
-        if (uri != null && uri.contains("/auth/")) return "auth";
-        if (uri != null && uri.contains("/ossCallback/")) return "callback";
-        if (uri != null && uri.contains("/deviceUpload/")) return "upload";
+        if (uri != null && uri.contains("/auth/")) {
+            return "auth";
+        }
+        if (uri != null && uri.contains("/ossCallback/")) {
+            return "callback";
+        }
+        if (uri != null && uri.contains("/deviceUpload/")) {
+            return "upload";
+        }
         return "api";
     }
 }

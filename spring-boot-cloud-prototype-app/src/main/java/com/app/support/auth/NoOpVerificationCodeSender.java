@@ -2,7 +2,9 @@ package com.app.support.auth;
 
 import org.springframework.stereotype.Component;
 
-/** 不连接外部邮件服务的验证码发送适配器。 */
+/**
+ * 不连接外部邮件服务的验证码发送适配器。
+ */
 @Component
 public class NoOpVerificationCodeSender implements VerificationCodeSender {
     @Override

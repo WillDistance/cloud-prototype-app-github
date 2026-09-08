@@ -1,8 +1,8 @@
 package com.app.config;
 
 import com.app.interceptors.JwtAuthenticationInterceptor;
-import com.app.security.JwtTokenService;
 import com.app.interceptors.RateLimitInterceptor;
+import com.app.security.JwtTokenService;
 import com.app.support.ratelimit.RateLimiter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

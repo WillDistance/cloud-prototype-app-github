@@ -19,6 +19,12 @@ public interface DeviceBindingMapper extends BaseMapper<DeviceBindingEntity> {
      * @param id 设备绑定记录主键ID
      * @return 查询结果
      */
+    /**
+     * 执行数据库查询操作。
+     *
+     * @param id 数据库查询参数
+     * @return 数据库查询结果
+     */
     DeviceBindingEntity selectByIdForUpdate(Long id);
     /**
      * 在期望状态匹配时原子更新记录状态。
@@ -26,6 +32,14 @@ public interface DeviceBindingMapper extends BaseMapper<DeviceBindingEntity> {
      * @param id 数据库记录主键ID
      * @param status 目标状态
      * @param expectedStatus 期望的当前状态
+     * @return 受影响的记录数
+     */
+    /**
+     * 执行数据库更新操作。
+     *
+     * @param id             数据库查询参数
+     * @param status         数据库查询参数
+     * @param expectedStatus 数据库查询参数
      * @return 受影响的记录数
      */
     int updateStatusById(@Param("id") Long id, @Param("status") String status, @Param("expectedStatus") String expectedStatus);

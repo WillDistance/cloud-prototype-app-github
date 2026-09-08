@@ -1,12 +1,9 @@
 package com.app.config;
 
-import com.app.records.AuthenticatedUser;
 import com.app.utils.UserContextHolderUtil;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import java.time.LocalDateTime;
 

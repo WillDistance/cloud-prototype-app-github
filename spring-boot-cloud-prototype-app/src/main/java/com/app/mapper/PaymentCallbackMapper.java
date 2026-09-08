@@ -18,5 +18,11 @@ public interface PaymentCallbackMapper extends BaseMapper<PaymentCallbackEntity>
      * @param id 数据库查询参数
      * @return 查询结果
      */
+    /**
+     * 执行数据库查询操作。
+     *
+     * @param id 数据库查询参数
+     * @return 数据库查询结果
+     */
     PaymentCallbackEntity selectByIdForUpdate(Long id);
 }

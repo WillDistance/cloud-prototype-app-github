@@ -23,8 +23,12 @@ public class JwtTokenService {
     private final Duration ttl;
 
     public JwtTokenService(String secret, Duration ttl) {
-        if (secret == null || secret.length() < 32) throw new IllegalStateException("JWT_SECRET至少需要32个字符");
-        if (ttl == null || ttl.isZero() || ttl.isNegative()) throw new IllegalStateException("JWT_TTL必须为正数");
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalStateException("JWT_SECRET至少需要32个字符");
+        }
+        if (ttl == null || ttl.isZero() || ttl.isNegative()) {
+            throw new IllegalStateException("JWT_TTL必须为正数");
+        }
         this.secret = secret.getBytes(java.nio.charset.StandardCharsets.UTF_8);
         this.ttl = ttl;
     }
