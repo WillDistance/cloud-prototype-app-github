@@ -1,26 +1,32 @@
 package com.app.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
-
 /**
- * 数据库存储枚举
+ * 通知发送状态
  *
  * @author yanlei
- * @since 2026-09-06
+ * @since 2026-09-09
  */
-@Getter
 public enum NotificationStatusEnum {
-    PENDING("PENDING"),
-    SENDING("SENDING"),
-    SENT("SENT"),
-    FAILED("FAILED"),
-    CANCELLED("CANCELLED");
-
-    @EnumValue
+    PENDING("PENDING", "待发送"),
+    SENDING("SENDING", "发送中"),
+    SENT("SENT", "发送成功"),
+    FAILED("FAILED", "发送失败"),
+    CANCELLED("CANCELLED", "已取消");
     private final String value;
 
-    NotificationStatusEnum(String value) {
+    /** 枚举中文名称 */
+    private final String name;
+
+    NotificationStatusEnum(String value, String name) {
         this.value = value;
+        this.name = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getName() {
+        return name;
     }
 }

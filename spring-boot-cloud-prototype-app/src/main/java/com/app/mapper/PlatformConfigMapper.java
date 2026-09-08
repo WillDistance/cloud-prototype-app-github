@@ -5,21 +5,28 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.time.LocalDateTime;
-
 /**
- * PlatformConfigEntity数据访问接口
+ * t_platform_config表数据访问接口
  *
  * @author yanlei
- * @since 2026-09-06
+ * @since 2026-09-09
  */
 @Mapper
 public interface PlatformConfigMapper extends BaseMapper<PlatformConfigEntity> {
     /**
-     * 查询指定时刻生效的平台配置。
+     * 按主键查询并锁定数据库记录。
      *
-     * @param now 当前UTC时间
+     * @param id 数据库查询参数
      * @return 查询结果
      */
-    PlatformConfigEntity selectCurrentActive(@Param("now") LocalDateTime now);
+    PlatformConfigEntity selectByIdForUpdate(Long id);
+    /**
+     * 在期望状态匹配时原子更新记录状态。
+     *
+     * @param id 数据库记录主键ID
+     * @param status 目标状态
+     * @param expectedStatus 期望的当前状态
+     * @return 受影响的记录数
+     */
+    int updateStatusById(@Param("id") Long id, @Param("status") String status, @Param("expectedStatus") String expectedStatus);
 }

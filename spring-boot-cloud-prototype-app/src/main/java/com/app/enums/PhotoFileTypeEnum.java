@@ -1,24 +1,30 @@
 package com.app.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
-
 /**
- * 数据库存储枚举
+ * 照片文件版本
  *
  * @author yanlei
- * @since 2026-09-06
+ * @since 2026-09-09
  */
-@Getter
 public enum PhotoFileTypeEnum {
-    ORIGINAL("ORIGINAL"),
-    THUMBNAIL("THUMBNAIL"),
-    PREVIEW("PREVIEW");
-
-    @EnumValue
+    ORIGINAL("ORIGINAL", "原图"),
+    THUMBNAIL("THUMBNAIL", "缩略图"),
+    PREVIEW("PREVIEW", "预览图");
     private final String value;
 
-    PhotoFileTypeEnum(String value) {
+    /** 枚举中文名称 */
+    private final String name;
+
+    PhotoFileTypeEnum(String value, String name) {
         this.value = value;
+        this.name = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getName() {
+        return name;
     }
 }

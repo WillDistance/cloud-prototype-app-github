@@ -1,25 +1,32 @@
 package com.app.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
-
 /**
- * 数据库存储枚举
+ * 验证码状态
  *
  * @author yanlei
- * @since 2026-09-06
+ * @since 2026-09-09
  */
-@Getter
 public enum VerificationStatusEnum {
-    PENDING("PENDING"),
-    VERIFIED("VERIFIED"),
-    EXPIRED("EXPIRED"),
-    INVALIDATED("INVALIDATED");
-
-    @EnumValue
+    SEND_FAIL("SEND_FAIL", "发送失败"),
+    PENDING("PENDING", "待验证"),
+    VERIFIED("VERIFIED", "已验证"),
+    EXPIRED("EXPIRED", "已过期"),
+    INVALIDATED("INVALIDATED", "已作废");
     private final String value;
 
-    VerificationStatusEnum(String value) {
+    /** 枚举中文名称 */
+    private final String name;
+
+    VerificationStatusEnum(String value, String name) {
         this.value = value;
+        this.name = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getName() {
+        return name;
     }
 }

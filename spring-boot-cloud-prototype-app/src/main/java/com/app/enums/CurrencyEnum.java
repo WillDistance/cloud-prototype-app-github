@@ -1,22 +1,29 @@
 package com.app.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
-
 /**
- * 数据库存储枚举
+ * 币种
  *
  * @author yanlei
- * @since 2026-09-06
+ * @since 2026-09-09
  */
-@Getter
 public enum CurrencyEnum {
-    CNY("CNY");
-
-    @EnumValue
+    CNY("CNY", "人民币"),
+    USD("USD", "美元");
     private final String value;
 
-    CurrencyEnum(String value) {
+    /** 枚举中文名称 */
+    private final String name;
+
+    CurrencyEnum(String value, String name) {
         this.value = value;
+        this.name = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getName() {
+        return name;
     }
 }

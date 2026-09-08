@@ -1,23 +1,29 @@
 package com.app.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
-
 /**
- * 数据库存储枚举
+ * 通知发送渠道
  *
  * @author yanlei
- * @since 2026-09-06
+ * @since 2026-09-09
  */
-@Getter
 public enum NotificationChannelEnum {
-    EMAIL("EMAIL"),
-    IN_APP("IN_APP");
-
-    @EnumValue
+    EMAIL("EMAIL", "电子邮件"),
+    IN_APP("IN_APP", "应用内通知");
     private final String value;
 
-    NotificationChannelEnum(String value) {
+    /** 枚举中文名称 */
+    private final String name;
+
+    NotificationChannelEnum(String value, String name) {
         this.value = value;
+        this.name = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getName() {
+        return name;
     }
 }

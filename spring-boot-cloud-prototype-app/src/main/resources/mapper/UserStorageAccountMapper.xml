@@ -16,31 +16,11 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        ct.id, ct.user_id, ct.used_bytes, ct.reserved_bytes, ct.lock_version, ct.create_by, ct.create_time, ct.update_by, ct.update_time
+        id, user_id, used_bytes, reserved_bytes, lock_version, create_by, create_time, update_by, update_time
     </sql>
 
-    <select id="selectByUserId" resultMap="BaseResultMap">
-        SELECT * FROM t_user_storage_account WHERE user_id = #{userId} LIMIT 1
+    <select id="selectByIdForUpdate" resultMap="BaseResultMap" parameterType="long">
+        SELECT <include refid="Base_Column_List"/> FROM t_user_storage_account WHERE id = #{id} FOR UPDATE
     </select>
-
-    <select id="selectByUserIdForUpdate" resultMap="BaseResultMap">
-        SELECT * FROM t_user_storage_account WHERE user_id = #{userId} LIMIT 1 FOR UPDATE
-    </select>
-
-    <update id="increaseReservedBytes">
-        UPDATE t_user_storage_account SET reserved_bytes = reserved_bytes + #{bytes}, lock_version = lock_version + 1, update_time = UTC_TIMESTAMP(3) WHERE user_id = #{userId}
-    </update>
-
-    <update id="decreaseReservedBytes">
-        UPDATE t_user_storage_account SET reserved_bytes = reserved_bytes - #{bytes}, lock_version = lock_version + 1, update_time = UTC_TIMESTAMP(3) WHERE user_id = #{userId} AND reserved_bytes >= #{bytes}
-    </update>
-
-    <update id="moveReservedToUsed">
-        UPDATE t_user_storage_account SET reserved_bytes = reserved_bytes - #{reservedBytes}, used_bytes = used_bytes + #{usedBytes}, lock_version = lock_version + 1, update_time = UTC_TIMESTAMP(3) WHERE user_id = #{userId} AND reserved_bytes >= #{reservedBytes}
-    </update>
-
-    <update id="decreaseUsedBytes">
-        UPDATE t_user_storage_account SET used_bytes = used_bytes - #{bytes}, lock_version = lock_version + 1, update_time = UTC_TIMESTAMP(3) WHERE user_id = #{userId} AND used_bytes >= #{bytes}
-    </update>
 
 </mapper>

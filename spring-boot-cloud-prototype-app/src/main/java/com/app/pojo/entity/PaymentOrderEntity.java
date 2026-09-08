@@ -4,27 +4,25 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDateTime;
-import com.app.enums.*;
-
 /**
- * 存储套餐支付订单表
+ * t_payment_order表实体
  *
  * @author yanlei
- * @since 2026-09-06
+ * @since 2026-09-09
  */
 @Data
 @Accessors(chain = true)
 @TableName("t_payment_order")
-public class PaymentOrderEntity extends BaseField {
+public class PaymentOrderEntity {
     /** 主键ID */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
-    /** 订单业务编号 */
+    /** 商户订单号 */
     @TableField("order_no")
     private String orderNo;
 
@@ -32,7 +30,7 @@ public class PaymentOrderEntity extends BaseField {
     @TableField("user_id")
     private Long userId;
 
-    /** 购买的存储套餐ID */
+    /** 下单时选择的套餐ID */
     @TableField("storage_plan_id")
     private Long storagePlanId;
 
@@ -48,7 +46,7 @@ public class PaymentOrderEntity extends BaseField {
     @TableField("plan_name_snapshot")
     private String planNameSnapshot;
 
-    /** 套餐容量快照（字节） */
+    /** 套餐容量快照(字节) */
     @TableField("capacity_bytes_snapshot")
     private Long capacityBytesSnapshot;
 
@@ -58,37 +56,54 @@ public class PaymentOrderEntity extends BaseField {
 
     /** 套餐有效期单位快照：DAY=天，MONTH=自然月，YEAR=自然年 */
     @TableField("duration_unit_snapshot")
-    private DurationUnitEnum durationUnitSnapshot;
+    private String durationUnitSnapshot;
 
-    /** 订单金额（分） */
+    /** 应付金额(美元、人民币) */
     @TableField("amount_cent")
     private Long amountCent;
 
-    /** 货币类型 */
+    /** 币种：USD=美元，CNY=人民币 */
     @TableField("currency")
-    private CurrencyEnum currency;
+    private String currency;
 
-    /** 支付渠道 */
+    /** 支付渠道：PINGPONG=乒乓支付 */
     @TableField("payment_channel")
-    private PaymentChannelEnum paymentChannel;
+    private String paymentChannel;
 
-    /** 订单状态：PENDING=待支付，PAID=已支付，CLOSED=已关闭，PAYMENT_FAILED=支付失败 */
+    /** 订单状态：PENDING=待支付，PAID=已支付，CLOSED=已关闭，FAILED=支付失败，REFUNDED=已退款 */
     @TableField("status")
-    private PaymentOrderStatusEnum status;
+    private String status;
 
-    /** 支付过期时间（UTC，带毫秒） */
+    /** 订单支付过期时间(UTC，带毫秒) */
     @TableField("expire_time")
     private LocalDateTime expireTime;
 
-    /** 支付完成时间（UTC，带毫秒） */
+    /** 支付成功时间(UTC，带毫秒) */
     @TableField("paid_time")
     private LocalDateTime paidTime;
 
-    /** 订单关闭时间（UTC，带毫秒） */
+    /** 订单关闭时间(UTC，带毫秒) */
     @TableField("closed_time")
     private LocalDateTime closedTime;
 
-    /** 客户端幂等请求号 */
+    /** 客户端创建订单幂等号 */
     @TableField("client_request_id")
     private String clientRequestId;
+
+    /** 创建人 */
+    @TableField("create_by")
+    private String createBy;
+
+    /** 创建时间(UTC，带毫秒) */
+    @TableField("create_time")
+    private LocalDateTime createTime;
+
+    /** 更新人 */
+    @TableField("update_by")
+    private String updateBy;
+
+    /** 更新时间(UTC，带毫秒) */
+    @TableField("update_time")
+    private LocalDateTime updateTime;
+
 }

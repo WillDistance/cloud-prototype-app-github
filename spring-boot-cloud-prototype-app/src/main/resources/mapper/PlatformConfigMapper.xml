@@ -7,13 +7,11 @@
         <result column="id" jdbcType="BIGINT" property="id"/>
         <result column="config_version" jdbcType="VARCHAR" property="configVersion"/>
         <result column="max_file_size_bytes" jdbcType="BIGINT" property="maxFileSizeBytes"/>
-        <result column="allowed_extensions" jdbcType="VARCHAR" property="allowedExtensions" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
-        <result column="allowed_mime_types" jdbcType="VARCHAR" property="allowedMimeTypes" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result column="allowed_extensions" jdbcType="VARCHAR" property="allowedExtensions"/>
         <result column="device_gift_capacity_bytes" jdbcType="BIGINT" property="deviceGiftCapacityBytes"/>
         <result column="device_gift_duration_value" jdbcType="INTEGER" property="deviceGiftDurationValue"/>
         <result column="device_gift_duration_unit" jdbcType="VARCHAR" property="deviceGiftDurationUnit"/>
         <result column="status" jdbcType="VARCHAR" property="status"/>
-        <result column="effective_time" jdbcType="TIMESTAMP" property="effectiveTime"/>
         <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
@@ -21,11 +19,15 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        ct.id, ct.config_version, ct.max_file_size_bytes, ct.allowed_extensions, ct.allowed_mime_types, ct.device_gift_capacity_bytes, ct.device_gift_duration_value, ct.device_gift_duration_unit, ct.status, ct.effective_time, ct.create_by, ct.create_time, ct.update_by, ct.update_time
+        id, config_version, max_file_size_bytes, allowed_extensions, device_gift_capacity_bytes, device_gift_duration_value, device_gift_duration_unit, status, create_by, create_time, update_by, update_time
     </sql>
 
-    <select id="selectCurrentActive" resultMap="BaseResultMap">
-        SELECT * FROM t_platform_config WHERE status = 'ACTIVE' AND effective_time IS NOT NULL AND effective_time &lt;= #{now} ORDER BY effective_time DESC, id DESC LIMIT 1
+    <select id="selectByIdForUpdate" resultMap="BaseResultMap" parameterType="long">
+        SELECT <include refid="Base_Column_List"/> FROM t_platform_config WHERE id = #{id} FOR UPDATE
     </select>
+
+    <update id="updateStatusById">
+        UPDATE t_platform_config SET status = #{status}, update_time = CURRENT_TIMESTAMP(3) WHERE id = #{id} AND status = #{expectedStatus}
+    </update>
 
 </mapper>

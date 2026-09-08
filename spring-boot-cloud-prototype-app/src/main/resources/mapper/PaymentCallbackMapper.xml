@@ -10,10 +10,9 @@
         <result column="payment_channel" jdbcType="VARCHAR" property="paymentChannel"/>
         <result column="channel_transaction_no" jdbcType="VARCHAR" property="channelTransactionNo"/>
         <result column="callback_event_id" jdbcType="VARCHAR" property="callbackEventId"/>
-        <result column="callback_content_hash" jdbcType="VARCHAR" property="callbackContentHash"/>
         <result column="raw_payload" jdbcType="VARCHAR" property="rawPayload"/>
         <result column="signature_value" jdbcType="VARCHAR" property="signatureValue"/>
-        <result column="signature_verified" jdbcType="TINYINT" property="signatureVerified"/>
+        <result column="signature_verified" jdbcType="INTEGER" property="signatureVerified"/>
         <result column="callback_amount_cent" jdbcType="BIGINT" property="callbackAmountCent"/>
         <result column="callback_currency" jdbcType="VARCHAR" property="callbackCurrency"/>
         <result column="callback_status" jdbcType="VARCHAR" property="callbackStatus"/>
@@ -28,7 +27,11 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        ct.id, ct.payment_order_id, ct.order_no, ct.payment_channel, ct.channel_transaction_no, ct.callback_event_id, ct.callback_content_hash, ct.raw_payload, ct.signature_value, ct.signature_verified, ct.callback_amount_cent, ct.callback_currency, ct.callback_status, ct.process_status, ct.failure_reason, ct.received_time, ct.processed_time, ct.create_by, ct.create_time, ct.update_by, ct.update_time
+        id, payment_order_id, order_no, payment_channel, channel_transaction_no, callback_event_id, raw_payload, signature_value, signature_verified, callback_amount_cent, callback_currency, callback_status, process_status, failure_reason, received_time, processed_time, create_by, create_time, update_by, update_time
     </sql>
+
+    <select id="selectByIdForUpdate" resultMap="BaseResultMap" parameterType="long">
+        SELECT <include refid="Base_Column_List"/> FROM t_payment_callback WHERE id = #{id} FOR UPDATE
+    </select>
 
 </mapper>

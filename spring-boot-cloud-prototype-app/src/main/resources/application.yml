@@ -23,11 +23,11 @@ security:
     secret: ${JWT_SECRET:346d8179-bd86-405c-a9a5-69e66a6a9ff7}
     ttl: ${JWT_TTL:PT2H}
 
+
 oss:
-  endpoint: ${OSS_ENDPOINT:https://oss-cn-shenzhen.aliyuncs.com}
-  region: ${OSS_REGION:cn-shenzhen}
-  access-key-id: ${OSS_ACCESS_KEY_ID}
-  access-key-secret: ${OSS_ACCESS_KEY_SECRET}
-  bucket: ${OSS_BUCKET:yl-img-bucket}
+  obsType: MinIo # HwCloudObs 或 MinIo
+  url: ${OSS_ENDPOINT:http://127.0.0.1:9000} # 使用华为云obs时，桶的区域必须正确
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucketName: ${OSS_BUCKET:yl-img-bucket}
   callback-url: ${OSS_CALLBACK_URL:}
-  callback-test-signature: ${OSS_CALLBACK_TEST_SIGNATURE:local-callback-signature}

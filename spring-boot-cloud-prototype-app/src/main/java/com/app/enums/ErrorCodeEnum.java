@@ -14,6 +14,7 @@ public enum ErrorCodeEnum {
     E00000("E00000", "success"),
     E00001("E00001", "文件上传、下载失败"),
     E00002("E00002", "文件不存在"),
+    OSS("OSS10002", "对象存储异常"),
 
     AUTH_INVALID_CREDENTIALS("A10001", "邮箱或密码错误"),
     AUTH_CODE_INVALID("A10002", "验证码无效或已过期"),

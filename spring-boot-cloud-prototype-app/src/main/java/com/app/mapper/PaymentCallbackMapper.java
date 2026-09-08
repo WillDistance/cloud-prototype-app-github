@@ -5,11 +5,18 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * PaymentCallbackEntity数据访问接口
+ * t_payment_callback表数据访问接口
  *
  * @author yanlei
- * @since 2026-09-06
+ * @since 2026-09-09
  */
 @Mapper
 public interface PaymentCallbackMapper extends BaseMapper<PaymentCallbackEntity> {
+    /**
+     * 按主键查询并锁定数据库记录。
+     *
+     * @param id 数据库查询参数
+     * @return 查询结果
+     */
+    PaymentCallbackEntity selectByIdForUpdate(Long id);
 }

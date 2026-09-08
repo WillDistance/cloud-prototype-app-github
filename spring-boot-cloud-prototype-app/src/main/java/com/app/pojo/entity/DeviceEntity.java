@@ -4,37 +4,31 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDateTime;
-import com.app.enums.DeviceStatusEnum;
-
 /**
- * 云端相机设备表
+ * t_device表实体
  *
  * @author yanlei
- * @since 2026-09-06
+ * @since 2026-09-09
  */
 @Data
 @Accessors(chain = true)
 @TableName("t_device")
-public class DeviceEntity extends BaseField {
+public class DeviceEntity {
     /** 主键ID */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
     /** 设备业务ID，例如CC-2026-AB12-8A2F */
     @TableField("device_id")
     private String deviceId;
 
-    /** 设备初始绑定密码安全哈希 */
+    /** 设备初始绑定密码安全哈希，使用ARGON2ID算法 */
     @TableField("initial_password_hash")
     private String initialPasswordHash;
-
-    /** 设备密码哈希算法 */
-    @TableField("password_algorithm")
-    private String passwordAlgorithm;
 
     /** 设备型号 */
     @TableField("model")
@@ -42,9 +36,22 @@ public class DeviceEntity extends BaseField {
 
     /** 设备状态：UNBOUND=未绑定，BOUND=已绑定，DISABLED=已禁用 */
     @TableField("status")
-    private DeviceStatusEnum status;
+    private String status;
 
-    /** 最近在线时间（UTC，带毫秒） */
-    @TableField("last_online_time")
-    private LocalDateTime lastOnlineTime;
+    /** 创建人 */
+    @TableField("create_by")
+    private String createBy;
+
+    /** 创建时间(UTC，带毫秒) */
+    @TableField("create_time")
+    private LocalDateTime createTime;
+
+    /** 更新人 */
+    @TableField("update_by")
+    private String updateBy;
+
+    /** 更新时间(UTC，带毫秒) */
+    @TableField("update_time")
+    private LocalDateTime updateTime;
+
 }

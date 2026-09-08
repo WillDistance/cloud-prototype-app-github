@@ -1,5 +1,7 @@
 package com.app.support.ratelimit;
 
+import com.app.records.Window;
+
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,15 +32,5 @@ public class InMemoryRateLimiter implements RateLimiter {
             current.count().incrementAndGet();
             return true;
         }
-    }
-
-    /**
-     * 处理Window相关的业务逻辑。
-     *
-     * @param startedAt 方法参数（startedAt）
-     * @param count     方法参数（count）
-     * @return 处理结果
-     */
-    private record Window(long startedAt, AtomicInteger count) {
     }
 }

@@ -1,25 +1,29 @@
 package com.app.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
-
 /**
- * 数据库存储枚举
+ * 平台配置状态
  *
  * @author yanlei
- * @since 2026-09-06
+ * @since 2026-09-09
  */
-@Getter
 public enum PlatformConfigStatusEnum {
-    DRAFT("DRAFT"),
-    ACTIVE("ACTIVE"),
-    INACTIVE("INACTIVE"),
-    ARCHIVED("ARCHIVED");
-
-    @EnumValue
+    ACTIVE("ACTIVE", "生效"),
+    ARCHIVED("ARCHIVED", "已归档");
     private final String value;
 
-    PlatformConfigStatusEnum(String value) {
+    /** 枚举中文名称 */
+    private final String name;
+
+    PlatformConfigStatusEnum(String value, String name) {
         this.value = value;
+        this.name = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getName() {
+        return name;
     }
 }

@@ -14,8 +14,7 @@ SET NAMES utf8mb4;
 CREATE TABLE IF NOT EXISTS `t_user` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `email` varchar(320) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '登录邮箱，统一规范化为小写',
-  `password_hash` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '登录密码安全哈希，禁止保存明文',
-  `password_algorithm` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ARGON2ID' COMMENT '密码哈希算法',
+  `password_hash` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '登录密码安全哈希，禁止保存明文，使用ARGON2ID算法',
   `time_zone` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'IANA时区标识，例如Asia/Shanghai',
   `preferred_language` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en' COMMENT '服务端通知语言偏好：zh-CN=简体中文，en=英语，de=德语',
   `status` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE' COMMENT '账号状态：ACTIVE=正常可用，LOCKED=已锁定，DISABLED=已禁用',
@@ -37,8 +36,8 @@ CREATE TABLE IF NOT EXISTS `t_email_verification_code` (
   `email` varchar(320) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '接收验证码的邮箱',
   `user_id` bigint unsigned DEFAULT NULL COMMENT '关联用户ID，注册场景可为空',
   `purpose` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用途：REGISTER=注册，RESET_PASSWORD=重置密码',
-  `code_hash` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '验证码安全哈希，禁止保存明文',
-  `status` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING' COMMENT '状态：PENDING=待验证，VERIFIED=已验证，EXPIRED=已过期，INVALIDATED=已作废',
+  `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '验证码明文保存',
+  `status` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING' COMMENT '状态：SEND_FAIL=发送失败，PENDING=待验证，VERIFIED=已验证，EXPIRED=已过期，INVALIDATED=已作废',
   `send_count` int unsigned NOT NULL DEFAULT 1 COMMENT '发送次数',
   `verify_fail_count` int unsigned NOT NULL DEFAULT 0 COMMENT '验证失败次数',
   `expire_time` datetime(3) NOT NULL COMMENT '验证码过期时间(UTC，带毫秒)',
@@ -52,7 +51,7 @@ CREATE TABLE IF NOT EXISTS `t_email_verification_code` (
   KEY `idx_verify_email_purpose_status` (`email`, `purpose`, `status`, `expire_time`),
   KEY `idx_verify_user_id` (`user_id`),
   CONSTRAINT `chk_verify_purpose` CHECK (`purpose` IN ('REGISTER', 'RESET_PASSWORD')),
-  CONSTRAINT `chk_verify_status` CHECK (`status` IN ('PENDING', 'VERIFIED', 'EXPIRED', 'INVALIDATED'))
+  CONSTRAINT `chk_verify_status` CHECK (`status` IN ('SEND_FAIL', 'PENDING', 'VERIFIED', 'EXPIRED', 'INVALIDATED'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='邮箱验证码表';
 
 -- =========================================================
@@ -62,11 +61,9 @@ CREATE TABLE IF NOT EXISTS `t_email_verification_code` (
 CREATE TABLE IF NOT EXISTS `t_device` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `device_id` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '设备业务ID，例如CC-2026-AB12-8A2F',
-  `initial_password_hash` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '设备初始绑定密码安全哈希',
-  `password_algorithm` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ARGON2ID' COMMENT '设备密码哈希算法',
+  `initial_password_hash` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '设备初始绑定密码安全哈希，使用ARGON2ID算法',
   `model` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '设备型号',
   `status` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'UNBOUND' COMMENT '设备状态：UNBOUND=未绑定，BOUND=已绑定，DISABLED=已禁用',
-  `last_online_time` datetime(3) DEFAULT NULL COMMENT '最近在线时间(UTC，带毫秒)',
   `create_by` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '创建人',
   `create_time` datetime(3) NOT NULL COMMENT '创建时间(UTC，带毫秒)',
   `update_by` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '更新人',
@@ -103,12 +100,10 @@ CREATE TABLE IF NOT EXISTS `t_platform_config` (
   `config_version` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '配置版本号',
   `max_file_size_bytes` bigint unsigned NOT NULL COMMENT '单文件大小上限(字节)',
   `allowed_extensions` json NOT NULL COMMENT '允许的文件扩展名JSON数组，例如["jpg","jpeg","png","heic"]',
-  `allowed_mime_types` json NOT NULL COMMENT '允许的MIME类型JSON数组',
   `device_gift_capacity_bytes` bigint unsigned NOT NULL COMMENT '设备绑定赠送容量(字节)',
   `device_gift_duration_value` int unsigned NOT NULL COMMENT '设备赠送有效期数值',
   `device_gift_duration_unit` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '设备赠送有效期单位：DAY=天，MONTH=自然月，YEAR=自然年',
-  `status` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'DRAFT' COMMENT '状态：DRAFT=草稿，ACTIVE=生效，INACTIVE=未生效，ARCHIVED=已归档',
-  `effective_time` datetime(3) DEFAULT NULL COMMENT '生效时间(UTC，带毫秒)',
+  `status` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE' COMMENT '状态，仅能存在一条生效中的数据，归档的数据类似于软删除：ACTIVE=生效，ARCHIVED=已归档',
   `create_by` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '创建人',
   `create_time` datetime(3) NOT NULL COMMENT '创建时间(UTC，带毫秒)',
   `update_by` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '更新人',
@@ -117,7 +112,7 @@ CREATE TABLE IF NOT EXISTS `t_platform_config` (
   UNIQUE KEY `uk_platform_config_version` (`config_version`),
   KEY `idx_platform_config_status_effective` (`status`, `effective_time`),
   CONSTRAINT `chk_platform_duration_unit` CHECK (`device_gift_duration_unit` IN ('DAY', 'MONTH', 'YEAR')),
-  CONSTRAINT `chk_platform_config_status` CHECK (`status` IN ('DRAFT', 'ACTIVE', 'INACTIVE', 'ARCHIVED'))
+  CONSTRAINT `chk_platform_config_status` CHECK (`status` IN ('ACTIVE', 'ARCHIVED'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='平台全局配置表';
 
 CREATE TABLE IF NOT EXISTS `t_storage_plan` (
@@ -128,11 +123,11 @@ CREATE TABLE IF NOT EXISTS `t_storage_plan` (
   `capacity_bytes` bigint unsigned NOT NULL COMMENT '增加容量(字节)',
   `duration_value` int unsigned NOT NULL COMMENT '有效期数值',
   `duration_unit` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '有效期单位：DAY=天，MONTH=自然月，YEAR=自然年',
-  `price_cent` bigint unsigned NOT NULL COMMENT '销售金额(人民币分)',
-  `currency` char(3) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'CNY' COMMENT '币种：CNY=人民币（当前仅支持）',
+  `price_cent` bigint unsigned NOT NULL COMMENT '销售金额(美元、人民币)',
+  `currency` char(3) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'USD' COMMENT '币种：USD=美元，CNY=人民币',
   `sort_order` int NOT NULL DEFAULT 0 COMMENT '展示排序，数值越小越靠前',
   `recommended` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否推荐：0=否，1=是',
-  `status` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE' COMMENT '状态：ACTIVE=生效销售中，OFF_SHELF=已下架，ARCHIVED=已归档',
+  `status` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE' COMMENT '状态，归档的数据类似于软删除：ACTIVE=生效销售中，OFF_SHELF=已下架，ARCHIVED=已归档',
   `effective_time` datetime(3) DEFAULT NULL COMMENT '生效时间(UTC，带毫秒)',
   `create_by` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '创建人',
   `create_time` datetime(3) NOT NULL COMMENT '创建时间(UTC，带毫秒)',
@@ -142,7 +137,7 @@ CREATE TABLE IF NOT EXISTS `t_storage_plan` (
   UNIQUE KEY `uk_plan_code_version` (`plan_code`, `plan_version`),
   KEY `idx_plan_status_sort` (`status`, `sort_order`),
   CONSTRAINT `chk_plan_duration_unit` CHECK (`duration_unit` IN ('DAY', 'MONTH', 'YEAR')),
-  CONSTRAINT `chk_plan_currency` CHECK (`currency` = 'CNY'),
+  CONSTRAINT `chk_plan_currency` CHECK (`currency` IN ('CNY','USD')),
   CONSTRAINT `chk_plan_recommended` CHECK (`recommended` IN (0, 1)),
   CONSTRAINT `chk_plan_status` CHECK (`status` IN ('ACTIVE', 'OFF_SHELF', 'ARCHIVED'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='云存储套餐表';
@@ -162,8 +157,8 @@ CREATE TABLE IF NOT EXISTS `t_payment_order` (
   `capacity_bytes_snapshot` bigint unsigned NOT NULL COMMENT '套餐容量快照(字节)',
   `duration_value_snapshot` int unsigned NOT NULL COMMENT '套餐有效期数值快照',
   `duration_unit_snapshot` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '套餐有效期单位快照：DAY=天，MONTH=自然月，YEAR=自然年',
-  `amount_cent` bigint unsigned NOT NULL COMMENT '应付金额(人民币分)',
-  `currency` char(3) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'CNY' COMMENT '币种：CNY=人民币',
+  `amount_cent` bigint unsigned NOT NULL COMMENT '应付金额(美元、人民币)',
+  `currency` char(3) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'CNY' COMMENT '币种：USD=美元，CNY=人民币',
   `payment_channel` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PINGPONG' COMMENT '支付渠道：PINGPONG=乒乓支付',
   `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING' COMMENT '订单状态：PENDING=待支付，PAID=已支付，CLOSED=已关闭，FAILED=支付失败，REFUNDED=已退款',
   `expire_time` datetime(3) NOT NULL COMMENT '订单支付过期时间(UTC，带毫秒)',
@@ -180,7 +175,7 @@ CREATE TABLE IF NOT EXISTS `t_payment_order` (
   KEY `idx_order_user_status_time` (`user_id`, `status`, `create_time`),
   KEY `idx_order_plan_id` (`storage_plan_id`),
   CONSTRAINT `chk_order_duration_unit` CHECK (`duration_unit_snapshot` IN ('DAY', 'MONTH', 'YEAR')),
-  CONSTRAINT `chk_order_currency` CHECK (`currency` = 'CNY'),
+  CONSTRAINT `chk_order_currency` CHECK (`currency` IN ('CNY','USD')),
   CONSTRAINT `chk_order_channel` CHECK (`payment_channel` = 'PINGPONG'),
   CONSTRAINT `chk_order_status` CHECK (`status` IN ('PENDING', 'PAID', 'CLOSED', 'FAILED', 'REFUNDED'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='存储套餐支付订单表';
@@ -192,7 +187,6 @@ CREATE TABLE IF NOT EXISTS `t_payment_callback` (
   `payment_channel` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PINGPONG' COMMENT '支付渠道：PINGPONG=乒乓支付',
   `channel_transaction_no` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '支付平台交易号',
   `callback_event_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '支付平台回调事件ID',
-  `callback_content_hash` char(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '回调原文SHA-256，用于去重和审计',
   `raw_payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '支付回调原文',
   `signature_value` text COLLATE utf8mb4_unicode_ci COMMENT '回调签名原文',
   `signature_verified` tinyint(1) NOT NULL DEFAULT 0 COMMENT '验签结果：0=失败，1=成功',
@@ -240,9 +234,8 @@ CREATE TABLE IF NOT EXISTS `t_storage_entitlement` (
   `entitlement_no` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '权益业务编号',
   `user_id` bigint unsigned NOT NULL COMMENT '权益所属用户ID',
   `source_type` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '权益来源：DEVICE_GIFT=设备绑定赠送，PURCHASE=用户购买',
-  `device_binding_id` bigint unsigned DEFAULT NULL COMMENT '设备赠送权益关联绑定ID',
   `payment_order_id` bigint unsigned DEFAULT NULL COMMENT '购买权益关联支付订单ID',
-  `name_snapshot` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '权益名称快照',
+  `name_snapshot` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户购买权益名称快照',
   `capacity_bytes` bigint unsigned NOT NULL COMMENT '权益提供容量(字节)',
   `duration_value` int unsigned NOT NULL COMMENT '权益有效期数值快照',
   `duration_unit` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '权益有效期单位快照：DAY=天，MONTH=自然月，YEAR=自然年',
@@ -257,103 +250,33 @@ CREATE TABLE IF NOT EXISTS `t_storage_entitlement` (
   `update_time` datetime(3) NOT NULL COMMENT '更新时间(UTC，带毫秒)',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_entitlement_no` (`entitlement_no`),
-  UNIQUE KEY `uk_entitlement_binding` (`device_binding_id`),
   UNIQUE KEY `uk_entitlement_order` (`payment_order_id`),
   KEY `idx_entitlement_user_status_expire` (`user_id`, `status`, `expire_time`),
-  CONSTRAINT `chk_entitlement_source` CHECK (
-    (`source_type` = 'DEVICE_GIFT' AND `device_binding_id` IS NOT NULL AND `payment_order_id` IS NULL)
-    OR (`source_type` = 'PURCHASE' AND `payment_order_id` IS NOT NULL AND `device_binding_id` IS NULL)
-  ),
+  CONSTRAINT `chk_entitlement_source` CHECK (`source_type` IN ('DEVICE_GIFT', 'PURCHASE')),
   CONSTRAINT `chk_entitlement_duration_unit` CHECK (`duration_unit` IN ('DAY', 'MONTH', 'YEAR')),
   CONSTRAINT `chk_entitlement_status` CHECK (`status` IN ('ACTIVE', 'EXPIRED', 'REVOKED')),
   CONSTRAINT `chk_entitlement_time` CHECK (`expire_time` > `effective_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户独立存储权益表';
 
 -- =========================================================
--- 6. 设备上传、照片与派生文件
+-- 6. 设备上传照片与派生文件
 -- =========================================================
-
-CREATE TABLE IF NOT EXISTS `t_upload_session` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `upload_no` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '上传会话业务编号',
-  `request_source` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'BOUND_DEVICE' COMMENT '上传请求来源：BOUND_DEVICE=用户已永久绑定的设备（当前仅允许该值，用户App无上传权限）',
-  `device_auth_type` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'DEVICE_PASSWORD' COMMENT '设备鉴权方式：DEVICE_PASSWORD=设备ID与设备密码鉴权（当前仅允许该值）',
-  `user_id` bigint unsigned NOT NULL COMMENT '照片归属用户ID，只能由设备永久绑定关系确定，不接受请求参数指定',
-  `device_id` bigint unsigned NOT NULL COMMENT '通过鉴权并申请本次上传链接的绑定设备表主键ID',
-  `device_binding_id` bigint unsigned NOT NULL COMMENT '申请设备对应的唯一永久绑定关系ID',
-  `device_authenticated_time` datetime(3) NOT NULL COMMENT '设备身份及永久绑定关系校验通过时间(UTC，带毫秒)',
-  `user_time_zone_snapshot` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '上传时读取的用户IANA时区快照',
-  `original_file_name` varchar(512) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '设备上报的原文件名',
-  `declared_content_type` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '设备声明的MIME类型',
-  `declared_file_size_bytes` bigint unsigned NOT NULL COMMENT '设备声明的文件大小(字节)',
-  `reserved_bytes` bigint unsigned NOT NULL COMMENT '本次上传预留容量(字节)',
-  `original_object_key` varchar(512) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '服务端为本次绑定设备上传会话生成并限定的OSS原图对象路径',
-  `upload_url_expire_time` datetime(3) NOT NULL COMMENT 'OSS临时上传链接过期时间(UTC，带毫秒)',
-  `status` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'URL_ISSUED' COMMENT '状态：URL_ISSUED=已签发上传链接，ORIGINAL_UPLOADED=原图已上传，PROCESSING=派生图处理中，COMPLETED=处理完成，FAILED=处理失败，EXPIRED=上传会话已过期',
-  `oss_callback_event_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'OSS回调事件ID，用于幂等',
-  `failure_code` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '失败码',
-  `failure_reason` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '失败原因',
-  `completed_time` datetime(3) DEFAULT NULL COMMENT '上传处理完成时间(UTC，带毫秒)',
-  `create_by` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '创建人',
-  `create_time` datetime(3) NOT NULL COMMENT '创建时间(UTC，带毫秒)',
-  `update_by` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '更新人',
-  `update_time` datetime(3) NOT NULL COMMENT '更新时间(UTC，带毫秒)',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_upload_no` (`upload_no`),
-  UNIQUE KEY `uk_upload_original_object_key` (`original_object_key`),
-  UNIQUE KEY `uk_upload_oss_callback_event` (`oss_callback_event_id`),
-  KEY `idx_upload_user_status_time` (`user_id`, `status`, `create_time`),
-  KEY `idx_upload_device_status` (`device_id`, `status`),
-  KEY `idx_upload_expire_status` (`upload_url_expire_time`, `status`),
-  CONSTRAINT `chk_upload_request_source` CHECK (`request_source` = 'BOUND_DEVICE'),
-  CONSTRAINT `chk_upload_device_auth_type` CHECK (`device_auth_type` = 'DEVICE_PASSWORD'),
-  CONSTRAINT `chk_upload_status` CHECK (`status` IN ('URL_ISSUED', 'ORIGINAL_UPLOADED', 'PROCESSING', 'COMPLETED', 'FAILED', 'EXPIRED'))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='设备OSS临时上传会话表';
-
-CREATE TABLE IF NOT EXISTS `t_photo` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `photo_no` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '照片业务编号',
-  `upload_session_id` bigint unsigned NOT NULL COMMENT '来源绑定设备上传会话ID；照片不接受用户App直传创建',
-  `user_id` bigint unsigned NOT NULL COMMENT '照片所属用户ID，从上传会话的永久绑定关系继承',
-  `device_id` bigint unsigned NOT NULL COMMENT '实际申请上传会话并上传原图的绑定设备ID',
-  `device_binding_id` bigint unsigned NOT NULL COMMENT '上传时已校验的永久绑定关系ID',
-  `file_name` varchar(512) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '原始文件名',
-  `original_extension` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '原始文件扩展名',
-  `original_mime_type` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '原图MIME类型',
-  `original_size_bytes` bigint unsigned NOT NULL COMMENT '原图实际大小(字节)，用于容量计费',
-  `original_sha256` char(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '原图SHA-256，仅用于审计和排障，不阻止重复上传',
-  `width_pixels` int unsigned DEFAULT NULL COMMENT '原图宽度(像素)',
-  `height_pixels` int unsigned DEFAULT NULL COMMENT '原图高度(像素)',
-  `taken_time` datetime(3) DEFAULT NULL COMMENT '照片拍摄时间(UTC，带毫秒)，可为空',
-  `uploaded_time` datetime(3) NOT NULL COMMENT '原图上传完成时间(UTC，带毫秒)，相册排序及清理依据',
-  `user_time_zone_snapshot` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '上传时用户IANA时区快照',
-  `status` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'AVAILABLE' COMMENT '照片状态：AVAILABLE=可访问，DELETE_PENDING=待永久删除，DELETE_FAILED=删除失败',
-  `create_by` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '创建人',
-  `create_time` datetime(3) NOT NULL COMMENT '创建时间(UTC，带毫秒)',
-  `update_by` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '更新人',
-  `update_time` datetime(3) NOT NULL COMMENT '更新时间(UTC，带毫秒)',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_photo_no` (`photo_no`),
-  UNIQUE KEY `uk_photo_upload_session` (`upload_session_id`),
-  KEY `idx_photo_album` (`user_id`, `status`, `uploaded_time`, `id`),
-  KEY `idx_photo_device_time` (`device_id`, `uploaded_time`),
-  KEY `idx_photo_sha256` (`original_sha256`),
-  CONSTRAINT `chk_photo_status` CHECK (`status` IN ('AVAILABLE', 'DELETE_PENDING', 'DELETE_FAILED'))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='可访问照片元数据表';
 
 CREATE TABLE IF NOT EXISTS `t_photo_file` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `photo_id` bigint unsigned NOT NULL COMMENT '照片ID',
+  `user_id` bigint unsigned NOT NULL COMMENT '照片所属用户ID，从上传会话的设备绑定的账号关系获取',
+  `device_id` bigint unsigned NOT NULL COMMENT '绑定设备ID',
+  `file_name` varchar(512) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '原始文件名',
+  `extension` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '原始文件扩展名',
+  `mime_type` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '原图MIME类型',
+  `size_bytes` bigint unsigned NOT NULL COMMENT '文件实际大小(字节)，用于容量计费',
+  `user_time_zone_snapshot` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '上传时用户IANA时区快照',
+  `upload_url_expire_time` datetime(3) NOT NULL COMMENT 'OSS临时上传链接过期时间(UTC，带毫秒)',
   `file_type` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '文件版本：ORIGINAL=原图，THUMBNAIL=缩略图，PREVIEW=预览图',
   `object_key` varchar(512) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'OSS对象路径，不直接作为公网下载地址',
-  `mime_type` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '文件MIME类型',
-  `size_bytes` bigint unsigned NOT NULL COMMENT '文件实际大小(字节)',
-  `sha256` char(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '文件SHA-256',
-  `width_pixels` int unsigned DEFAULT NULL COMMENT '文件宽度(像素)',
-  `height_pixels` int unsigned DEFAULT NULL COMMENT '文件高度(像素)',
-  `status` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'AVAILABLE' COMMENT '文件状态：AVAILABLE=可用，DELETE_PENDING=待永久删除，DELETE_FAILED=删除失败',
+  `status` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'URL_ISSUED' COMMENT '照片状态：URL_ISSUED=已签发上传链接，ORIGINAL_UPLOADED=原图上传回调成功，PROCESSING=派生图处理中，COMPLETED=处理完成，AVAILABLE=可访问，FAILED=处理失败，DELETE_PENDING=待永久删除，DELETE_FAILED=删除失败',
   `delete_reason` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '删除原因：未删除时为空；USER_MANUAL=用户主动删除，ENTITLEMENT_EXPIRED=权益到期自动清理',
-  `oss_callback_event_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '对应OSS回调事件ID',
+  `uploaded_time` datetime(3) NOT NULL COMMENT '原图上传回调成功时间(UTC，带毫秒)，相册排序及清理依据',
   `create_by` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '创建人',
   `create_time` datetime(3) NOT NULL COMMENT '创建时间(UTC，带毫秒)',
   `update_by` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '更新人',
@@ -364,9 +287,9 @@ CREATE TABLE IF NOT EXISTS `t_photo_file` (
   UNIQUE KEY `uk_photo_file_oss_callback` (`oss_callback_event_id`),
   KEY `idx_photo_file_status` (`status`),
   CONSTRAINT `chk_photo_file_type` CHECK (`file_type` IN ('ORIGINAL', 'THUMBNAIL', 'PREVIEW')),
-  CONSTRAINT `chk_photo_file_status` CHECK (`status` IN ('AVAILABLE', 'DELETE_PENDING', 'DELETE_FAILED')),
+  CONSTRAINT `chk_photo_file_status` CHECK (`status` IN ('URL_ISSUED','ORIGINAL_UPLOADED','PROCESSING','COMPLETED','AVAILABLE', 'DELETE_PENDING', 'DELETE_FAILED')),
   CONSTRAINT `chk_photo_file_delete_reason` CHECK (`delete_reason` IS NULL OR `delete_reason` IN ('USER_MANUAL', 'ENTITLEMENT_EXPIRED'))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='照片原图及派生文件表';
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='上传照片记录，原图及派生文件表';
 
 -- =========================================================
 -- =========================================================
@@ -381,12 +304,9 @@ CREATE TABLE IF NOT EXISTS `t_notification` (
   `language_code` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en' COMMENT '通知语言：zh-CN=简体中文，en=英语，de=德语',
   `channel` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'EMAIL' COMMENT '发送渠道：EMAIL=电子邮件，IN_APP=应用内通知',
   `recipient` varchar(320) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '接收地址或接收人标识',
-  `subject` varchar(512) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '通知标题快照',
-  `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '通知正文快照',
-  `business_type` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '关联业务类型',
-  `business_id` bigint unsigned DEFAULT NULL COMMENT '关联业务主键ID',
-  `idempotency_key` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '通知幂等键',
-  `status` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING' COMMENT '发送状态：PENDING=待发送，SENDING=发送中，SENT=发送成功，FAILED=发送失败，CANCELLED=已取消',
+  `subject` varchar(512) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '通知标题',
+  `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '通知正文',
+  `status` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING' COMMENT '发送状态：PENDING=待发送，SENDING=发送中，SENT=发送成功，FAILED=发送失败',
   `retry_count` int unsigned NOT NULL DEFAULT 0 COMMENT '已重试次数',
   `next_retry_time` datetime(3) DEFAULT NULL COMMENT '下次重试时间(UTC，带毫秒)',
   `sent_time` datetime(3) DEFAULT NULL COMMENT '发送成功时间(UTC，带毫秒)',
@@ -397,9 +317,7 @@ CREATE TABLE IF NOT EXISTS `t_notification` (
   `update_time` datetime(3) NOT NULL COMMENT '更新时间(UTC，带毫秒)',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_notification_no` (`notification_no`),
-  UNIQUE KEY `uk_notification_idempotency` (`idempotency_key`),
   KEY `idx_notification_user_time` (`user_id`, `create_time`),
-  KEY `idx_notification_retry` (`status`, `next_retry_time`),
   CONSTRAINT `chk_notification_language` CHECK (`language_code` IN ('zh-CN', 'en', 'de')),
   CONSTRAINT `chk_notification_channel` CHECK (`channel` IN ('EMAIL', 'IN_APP')),
   CONSTRAINT `chk_notification_status` CHECK (`status` IN ('PENDING', 'SENDING', 'SENT', 'FAILED', 'CANCELLED'))

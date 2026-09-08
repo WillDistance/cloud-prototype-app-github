@@ -1,26 +1,32 @@
 package com.app.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
-
 /**
- * 数据库存储枚举
+ * 支付订单状态
  *
  * @author yanlei
- * @since 2026-09-06
+ * @since 2026-09-09
  */
-@Getter
 public enum PaymentOrderStatusEnum {
-    PENDING("PENDING"),
-    PAID("PAID"),
-    CLOSED("CLOSED"),
-    FAILED("FAILED"),
-    REFUNDED("REFUNDED");
-
-    @EnumValue
+    PENDING("PENDING", "待支付"),
+    PAID("PAID", "已支付"),
+    CLOSED("CLOSED", "已关闭"),
+    FAILED("FAILED", "支付失败"),
+    REFUNDED("REFUNDED", "已退款");
     private final String value;
 
-    PaymentOrderStatusEnum(String value) {
+    /** 枚举中文名称 */
+    private final String name;
+
+    PaymentOrderStatusEnum(String value, String name) {
         this.value = value;
+        this.name = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getName() {
+        return name;
     }
 }

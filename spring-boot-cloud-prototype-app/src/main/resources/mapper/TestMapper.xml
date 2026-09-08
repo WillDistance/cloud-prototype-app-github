@@ -13,7 +13,11 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        ct.id, ct.name, ct.create_by, ct.create_time, ct.update_by, ct.update_time
+       id, name, create_by, create_time, update_by, update_time
     </sql>
+
+    <select id="selectByIdForUpdate" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_test WHERE id = #{id} FOR UPDATE
+    </select>
 
 </mapper>

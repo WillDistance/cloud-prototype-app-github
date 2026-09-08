@@ -13,9 +13,6 @@
         <result column="recipient" jdbcType="VARCHAR" property="recipient"/>
         <result column="subject" jdbcType="VARCHAR" property="subject"/>
         <result column="content" jdbcType="VARCHAR" property="content"/>
-        <result column="business_type" jdbcType="VARCHAR" property="businessType"/>
-        <result column="business_id" jdbcType="BIGINT" property="businessId"/>
-        <result column="idempotency_key" jdbcType="VARCHAR" property="idempotencyKey"/>
         <result column="status" jdbcType="VARCHAR" property="status"/>
         <result column="retry_count" jdbcType="INTEGER" property="retryCount"/>
         <result column="next_retry_time" jdbcType="TIMESTAMP" property="nextRetryTime"/>
@@ -28,7 +25,15 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        ct.id, ct.notification_no, ct.user_id, ct.notification_type, ct.language_code, ct.channel, ct.recipient, ct.subject, ct.content, ct.business_type, ct.business_id, ct.idempotency_key, ct.status, ct.retry_count, ct.next_retry_time, ct.sent_time, ct.failure_reason, ct.create_by, ct.create_time, ct.update_by, ct.update_time
+        id, notification_no, user_id, notification_type, language_code, channel, recipient, subject, content, status, retry_count, next_retry_time, sent_time, failure_reason, create_by, create_time, update_by, update_time
     </sql>
+
+    <select id="selectByIdForUpdate" resultMap="BaseResultMap" parameterType="long">
+        SELECT <include refid="Base_Column_List"/> FROM t_notification WHERE id = #{id} FOR UPDATE
+    </select>
+
+    <update id="updateStatusById">
+        UPDATE t_notification SET status = #{status}, update_time = CURRENT_TIMESTAMP(3) WHERE id = #{id} AND status = #{expectedStatus}
+    </update>
 
 </mapper>

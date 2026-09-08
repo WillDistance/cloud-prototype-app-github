@@ -29,15 +29,15 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        ct.id, ct.order_no, ct.user_id, ct.storage_plan_id, ct.plan_code_snapshot, ct.plan_version_snapshot, ct.plan_name_snapshot, ct.capacity_bytes_snapshot, ct.duration_value_snapshot, ct.duration_unit_snapshot, ct.amount_cent, ct.currency, ct.payment_channel, ct.status, ct.expire_time, ct.paid_time, ct.closed_time, ct.client_request_id, ct.create_by, ct.create_time, ct.update_by, ct.update_time
+        id, order_no, user_id, storage_plan_id, plan_code_snapshot, plan_version_snapshot, plan_name_snapshot, capacity_bytes_snapshot, duration_value_snapshot, duration_unit_snapshot, amount_cent, currency, payment_channel, status, expire_time, paid_time, closed_time, client_request_id, create_by, create_time, update_by, update_time
     </sql>
 
-    <select id="selectByUserAndClientRequestId" resultMap="BaseResultMap">
-        SELECT * FROM t_payment_order WHERE user_id = #{userId} AND client_request_id = #{clientRequestId} LIMIT 1
+    <select id="selectByIdForUpdate" resultMap="BaseResultMap" parameterType="long">
+        SELECT <include refid="Base_Column_List"/> FROM t_payment_order WHERE id = #{id} FOR UPDATE
     </select>
 
-    <select id="selectByUserAndOrderNo" resultMap="BaseResultMap">
-        SELECT * FROM t_payment_order WHERE user_id = #{userId} AND order_no = #{orderNo} LIMIT 1
-    </select>
+    <update id="updateStatusById">
+        UPDATE t_payment_order SET status = #{status}, update_time = CURRENT_TIMESTAMP(3) WHERE id = #{id} AND status = #{expectedStatus}
+    </update>
 
 </mapper>

@@ -1,24 +1,30 @@
 package com.app.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
-
 /**
- * 数据库存储枚举
+ * 设备状态
  *
  * @author yanlei
- * @since 2026-09-06
+ * @since 2026-09-09
  */
-@Getter
 public enum DeviceStatusEnum {
-    UNBOUND("UNBOUND"),
-    BOUND("BOUND"),
-    DISABLED("DISABLED");
-
-    @EnumValue
+    UNBOUND("UNBOUND", "未绑定"),
+    BOUND("BOUND", "已绑定"),
+    DISABLED("DISABLED", "已禁用");
     private final String value;
 
-    DeviceStatusEnum(String value) {
+    /** 枚举中文名称 */
+    private final String name;
+
+    DeviceStatusEnum(String value, String name) {
         this.value = value;
+        this.name = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getName() {
+        return name;
     }
 }

@@ -1,23 +1,29 @@
 package com.app.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
-
 /**
- * 数据库存储枚举
+ * 权益来源
  *
  * @author yanlei
- * @since 2026-09-06
+ * @since 2026-09-09
  */
-@Getter
 public enum EntitlementSourceTypeEnum {
-    DEVICE_GIFT("DEVICE_GIFT"),
-    PURCHASE("PURCHASE");
-
-    @EnumValue
+    DEVICE_GIFT("DEVICE_GIFT", "设备绑定赠送"),
+    PURCHASE("PURCHASE", "用户购买");
     private final String value;
 
-    EntitlementSourceTypeEnum(String value) {
+    /** 枚举中文名称 */
+    private final String name;
+
+    EntitlementSourceTypeEnum(String value, String name) {
         this.value = value;
+        this.name = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getName() {
+        return name;
     }
 }

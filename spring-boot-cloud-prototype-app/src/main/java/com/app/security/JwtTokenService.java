@@ -5,6 +5,7 @@ import cn.hutool.jwt.JWTException;
 import cn.hutool.jwt.JWTUtil;
 import com.app.enums.ErrorCodeEnum;
 import com.app.exception.AuthenticationException;
+import com.app.records.AuthenticatedUser;
 
 import java.time.Duration;
 import java.util.HashMap;

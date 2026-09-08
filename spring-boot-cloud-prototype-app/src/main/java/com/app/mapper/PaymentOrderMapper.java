@@ -6,29 +6,27 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 /**
- * PaymentOrderEntity数据访问接口
+ * t_payment_order表数据访问接口
  *
  * @author yanlei
- * @since 2026-09-06
+ * @since 2026-09-09
  */
 @Mapper
 public interface PaymentOrderMapper extends BaseMapper<PaymentOrderEntity> {
     /**
-     * 按用户与客户端幂等号查询订单
+     * 按主键查询并锁定数据库记录。
      *
-     * @param userId          用户ID
-     * @param clientRequestId 客户端幂等号
-     * @return 支付订单
+     * @param id 支付订单主键ID
+     * @return 查询结果
      */
-    PaymentOrderEntity selectByUserAndClientRequestId(@Param("userId") Long userId,
-                                                      @Param("clientRequestId") String clientRequestId);
-
+    PaymentOrderEntity selectByIdForUpdate(Long id);
     /**
-     * 按用户与订单号查询订单
+     * 在期望状态匹配时原子更新记录状态。
      *
-     * @param userId  用户ID
-     * @param orderNo 订单号
-     * @return 支付订单
+     * @param id 数据库记录主键ID
+     * @param status 目标状态
+     * @param expectedStatus 期望的当前状态
+     * @return 受影响的记录数
      */
-    PaymentOrderEntity selectByUserAndOrderNo(@Param("userId") Long userId, @Param("orderNo") String orderNo);
+    int updateStatusById(@Param("id") Long id, @Param("status") String status, @Param("expectedStatus") String expectedStatus);
 }

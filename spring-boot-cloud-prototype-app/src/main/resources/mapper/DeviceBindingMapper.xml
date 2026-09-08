@@ -17,35 +17,15 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        ct.id, ct.user_id, ct.device_id, ct.bind_time, ct.bind_user_time_zone, ct.status, ct.create_by, ct.create_time, ct.update_by, ct.update_time
+        id, user_id, device_id, bind_time, bind_user_time_zone, status, create_by, create_time, update_by, update_time
     </sql>
 
-    <resultMap id="UserResultMap" type="com.app.pojo.entity.UserEntity">
-        <result column="id" jdbcType="BIGINT" property="id"/>
-        <result column="email" jdbcType="VARCHAR" property="email"/>
-        <result column="password_hash" jdbcType="VARCHAR" property="passwordHash"/>
-        <result column="password_algorithm" jdbcType="VARCHAR" property="passwordAlgorithm"/>
-        <result column="time_zone" jdbcType="VARCHAR" property="timeZone"/>
-        <result column="preferred_language" jdbcType="VARCHAR" property="preferredLanguage"/>
-        <result column="status" jdbcType="VARCHAR" property="status"/>
-        <result column="last_login_time" jdbcType="TIMESTAMP" property="lastLoginTime"/>
-        <result column="password_update_time" jdbcType="TIMESTAMP" property="passwordUpdateTime"/>
-        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
-    </resultMap>
-
-    <select id="selectUserForUpdate" resultMap="UserResultMap">
-        SELECT * FROM t_user WHERE id = #{userId} LIMIT 1 FOR UPDATE
+    <select id="selectByIdForUpdate" resultMap="BaseResultMap" parameterType="long">
+        SELECT <include refid="Base_Column_List"/> FROM t_device_binding WHERE id = #{id} FOR UPDATE
     </select>
 
-    <select id="selectByUserId" resultMap="BaseResultMap">
-        SELECT * FROM t_device_binding WHERE user_id = #{userId} LIMIT 1
-    </select>
-
-    <select id="selectByDeviceId" resultMap="BaseResultMap">
-        SELECT * FROM t_device_binding WHERE device_id = #{deviceId} LIMIT 1
-    </select>
+    <update id="updateStatusById">
+        UPDATE t_device_binding SET status = #{status}, update_time = CURRENT_TIMESTAMP(3) WHERE id = #{id} AND status = #{expectedStatus}
+    </update>
 
 </mapper>

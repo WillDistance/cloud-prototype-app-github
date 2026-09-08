@@ -1,24 +1,30 @@
 package com.app.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
-
 /**
- * 数据库存储枚举
+ * 有效期单位
  *
  * @author yanlei
- * @since 2026-09-06
+ * @since 2026-09-09
  */
-@Getter
 public enum DurationUnitEnum {
-    DAY("DAY"),
-    MONTH("MONTH"),
-    YEAR("YEAR");
-
-    @EnumValue
+    DAY("DAY", "天"),
+    MONTH("MONTH", "自然月"),
+    YEAR("YEAR", "自然年");
     private final String value;
 
-    DurationUnitEnum(String value) {
+    /** 枚举中文名称 */
+    private final String name;
+
+    DurationUnitEnum(String value, String name) {
         this.value = value;
+        this.name = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getName() {
+        return name;
     }
 }

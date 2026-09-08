@@ -1,32 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.app.mapper.EmailVerificationCodeMapper">
-
-    <resultMap id="BaseResultMap" type="com.app.pojo.entity.EmailVerificationCodeEntity">
-        <result column="id" jdbcType="BIGINT" property="id"/>
-        <result column="email" jdbcType="VARCHAR" property="email"/>
-        <result column="user_id" jdbcType="BIGINT" property="userId"/>
-        <result column="purpose" jdbcType="VARCHAR" property="purpose"/>
-        <result column="code_hash" jdbcType="VARCHAR" property="codeHash"/>
-        <result column="status" jdbcType="VARCHAR" property="status"/>
-        <result column="send_count" jdbcType="INTEGER" property="sendCount"/>
-        <result column="verify_fail_count" jdbcType="INTEGER" property="verifyFailCount"/>
-        <result column="expire_time" jdbcType="TIMESTAMP" property="expireTime"/>
-        <result column="verified_time" jdbcType="TIMESTAMP" property="verifiedTime"/>
-        <result column="request_ip" jdbcType="VARCHAR" property="requestIp"/>
-        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
-    </resultMap>
-
-    <sql id="Base_Column_List">
-        ct.id, ct.email, ct.user_id, ct.purpose, ct.code_hash, ct.status, ct.send_count, ct.verify_fail_count, ct.expire_time, ct.verified_time, ct.request_ip, ct.create_by, ct.create_time, ct.update_by, ct.update_time
-    </sql>
-
-    <update id="updateStatusIfCurrent">
-        UPDATE t_email_verification_code SET status=#{target}, update_time=UTC_TIMESTAMP(3) WHERE id=#{id} AND status=#{current}
-    </update>
-
+ <resultMap id="BaseResultMap" type="com.app.pojo.entity.EmailVerificationCodeEntity"><result column="id" property="id"/><result column="email" property="email"/><result column="user_id" property="userId"/><result column="purpose" property="purpose"/><result column="code" property="code"/><result column="status" property="status"/><result column="send_count" property="sendCount"/><result column="verify_fail_count" property="verifyFailCount"/><result column="expire_time" property="expireTime"/><result column="verified_time" property="verifiedTime"/><result column="request_ip" property="requestIp"/><result column="create_by" property="createBy"/><result column="create_time" property="createTime"/><result column="update_by" property="updateBy"/><result column="update_time" property="updateTime"/></resultMap>
+ <sql id="Base_Column_List">id, email, user_id, purpose, code, status, send_count, verify_fail_count, expire_time, verified_time, request_ip, create_by, create_time, update_by, update_time</sql>
+ <select id="selectByIdForUpdate" resultMap="BaseResultMap">SELECT * FROM t_email_verification_code WHERE id=#{id} FOR UPDATE</select>
+ <select id="selectLatest" resultMap="BaseResultMap">SELECT * FROM t_email_verification_code WHERE email=#{email} AND purpose=#{purpose} ORDER BY create_time DESC LIMIT 1</select>
+ <update id="markVerified">UPDATE t_email_verification_code SET status='VERIFIED', verified_time=CURRENT_TIMESTAMP(3), update_time=CURRENT_TIMESTAMP(3) WHERE id=#{id} AND status='PENDING'</update>
+ <update id="incrementFailures">UPDATE t_email_verification_code SET verify_fail_count=verify_fail_count+1, update_time=CURRENT_TIMESTAMP(3) WHERE id=#{id} AND status='PENDING'</update>
+ <update id="updateStatusById">UPDATE t_email_verification_code SET status = #{status}, update_time=CURRENT_TIMESTAMP(3) WHERE id=#{id} AND status = #{expectedStatus}</update>
 </mapper>

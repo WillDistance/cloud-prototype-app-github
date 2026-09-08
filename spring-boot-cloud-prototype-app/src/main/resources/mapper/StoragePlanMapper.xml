@@ -14,7 +14,7 @@
         <result column="price_cent" jdbcType="BIGINT" property="priceCent"/>
         <result column="currency" jdbcType="VARCHAR" property="currency"/>
         <result column="sort_order" jdbcType="INTEGER" property="sortOrder"/>
-        <result column="recommended" jdbcType="TINYINT" property="recommended"/>
+        <result column="recommended" jdbcType="INTEGER" property="recommended"/>
         <result column="status" jdbcType="VARCHAR" property="status"/>
         <result column="effective_time" jdbcType="TIMESTAMP" property="effectiveTime"/>
         <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
@@ -24,15 +24,15 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        ct.id, ct.plan_code, ct.plan_version, ct.plan_name, ct.capacity_bytes, ct.duration_value, ct.duration_unit, ct.price_cent, ct.currency, ct.sort_order, ct.recommended, ct.status, ct.effective_time, ct.create_by, ct.create_time, ct.update_by, ct.update_time
+        id, plan_code, plan_version, plan_name, capacity_bytes, duration_value, duration_unit, price_cent, currency, sort_order, recommended, status, effective_time, create_by, create_time, update_by, update_time
     </sql>
 
-    <select id="selectActivePlan" resultMap="BaseResultMap">
-        SELECT * FROM t_storage_plan WHERE plan_code = #{planCode} AND plan_version = #{planVersion} AND status = 'ACTIVE' AND effective_time IS NOT NULL AND effective_time &lt;= #{now} LIMIT 1
+    <select id="selectByIdForUpdate" resultMap="BaseResultMap" parameterType="long">
+        SELECT <include refid="Base_Column_List"/> FROM t_storage_plan WHERE id = #{id} FOR UPDATE
     </select>
 
-    <select id="selectActivePlans" resultMap="BaseResultMap">
-        SELECT * FROM t_storage_plan WHERE status = 'ACTIVE' AND effective_time IS NOT NULL AND effective_time &lt;= #{now} ORDER BY sort_order ASC, id ASC
-    </select>
+    <update id="updateStatusById">
+        UPDATE t_storage_plan SET status = #{status}, update_time = CURRENT_TIMESTAMP(3) WHERE id = #{id} AND status = #{expectedStatus}
+    </update>
 
 </mapper>
