@@ -20,8 +20,10 @@ mybatis-plus:
 
 security:
   jwt:
-    secret: ${JWT_SECRET:346d8179-bd86-405c-a9a5-69e66a6a9ff7}
-    ttl: ${JWT_TTL:PT2H}
+    secret: ${JWT_SECRET:[REDACTED]}
+    ttl: ${JWT_TTL:PT15M}
+  refresh-token:
+    ttl: ${JWT_REFRESH_TOKEN_TTL:PT30D}
 
 
 oss:

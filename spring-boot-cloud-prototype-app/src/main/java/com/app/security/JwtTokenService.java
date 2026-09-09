@@ -47,11 +47,27 @@ public class JwtTokenService {
      * @return 已签名的JWT字符串
      */
     public String issue(Long userId, String timeZone) {
+        return issue(userId, timeZone, null);
+    }
+
+    /**
+     * 根据用户身份、时区和登录会话签发Access Token。
+     *
+     * @param userId 用户ID
+     * @param timeZone 用户保存的IANA时区
+     * @param sessionId Refresh Token会话ID
+     * @return 已签名的Access Token
+     */
+    public String issue(Long userId, String timeZone, String sessionId) {
         long issuedAt = System.currentTimeMillis() / 1000;
         Map<String, Object> payload = new HashMap<>();
         payload.put(JWT.SUBJECT, String.valueOf(userId));
         payload.put("tz", timeZone);
         payload.put(JWT.JWT_ID, UUID.randomUUID().toString());
+        payload.put("typ", "access");
+        if (sessionId != null) {
+            payload.put("sid", sessionId);
+        }
         payload.put(JWT.ISSUED_AT, issuedAt);
         payload.put(JWT.EXPIRES_AT, issuedAt + ttl.toSeconds());
         return JWTUtil.createToken(payload, secret);
@@ -70,6 +86,9 @@ public class JwtTokenService {
                 throw new AuthenticationException(ErrorCodeEnum.AUTH_REQUIRED);
             }
             JWT jwt = JWTUtil.parseToken(token);
+            if (!"access".equals(String.valueOf(jwt.getPayload("typ")))) {
+                throw new AuthenticationException(ErrorCodeEnum.AUTH_REQUIRED);
+            }
             Long userId = Long.valueOf(String.valueOf(jwt.getPayload(JWT.SUBJECT)));
             String timeZone = String.valueOf(jwt.getPayload("tz"));
             String tokenId = String.valueOf(jwt.getPayload(JWT.JWT_ID));

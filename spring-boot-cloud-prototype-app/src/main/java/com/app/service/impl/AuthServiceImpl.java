@@ -15,6 +15,7 @@ import com.app.pojo.entity.UserStorageAccountEntity;
 import com.app.pojo.vo.AuthTokenVo;
 import com.app.pojo.vo.UserVo;
 import com.app.security.JwtTokenService;
+import com.app.security.RefreshTokenService;
 import com.app.service.AuthService;
 import com.app.support.auth.VerificationCodeSender;
 import com.app.utils.UserContextHolderUtil;
@@ -50,6 +51,8 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtTokenService jwtTokenService;
+    @Autowired
+    private RefreshTokenService refreshTokenService;
     @Autowired
     private StringRedisTemplate redis;
     @Autowired
@@ -169,7 +172,30 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             throw new AuthenticationException(ErrorCodeEnum.AUTH_ACCESS_DENIED);
         }
         userMapper.updateLastLogin(user.getId());
-        return new AuthTokenVo(jwtTokenService.issue(user.getId(), user.getTimeZone()), "Bearer", 7200);
+        RefreshTokenService.IssuedRefreshToken refresh = refreshTokenService.issue(user.getId());
+        return tokenVo(user, refresh);
+    }
+
+    @Override
+    public AuthTokenVo refresh(RefreshTokenRequest request) {
+        RefreshTokenService.IssuedRefreshToken refresh = refreshTokenService.rotate(request.getRefreshToken());
+        UserEntity user = userMapper.selectById(refresh.session().getUserId());
+        if (user == null || !UserStatusEnum.ACTIVE.getValue().equals(user.getStatus())) {
+            throw new AuthenticationException(ErrorCodeEnum.AUTH_ACCESS_DENIED);
+        }
+        return tokenVo(user, refresh);
+    }
+
+    /**
+     * 组装Access Token和Refresh Token响应。
+     *
+     * @param user 当前登录用户
+     * @param refresh Refresh Token签发结果
+     * @return 双令牌响应
+     */
+    private AuthTokenVo tokenVo(UserEntity user, RefreshTokenService.IssuedRefreshToken refresh) {
+        String access = jwtTokenService.issue(user.getId(), user.getTimeZone(), refresh.session().getSessionId());
+        return new AuthTokenVo(access, refresh.token(), "Bearer", 7200, 2592000);
     }
 
     @Override
@@ -188,7 +214,10 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
     @Override
-    public void logout() {
+    public void logout(RefreshTokenRequest request) {
+        if (request != null && request.getRefreshToken() != null && !request.getRefreshToken().isBlank()) {
+            refreshTokenService.revoke(request.getRefreshToken());
+        }
         UserContextHolderUtil.clear();
     }
 

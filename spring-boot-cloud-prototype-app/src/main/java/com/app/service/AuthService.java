@@ -62,6 +62,14 @@ public interface AuthService extends IService<UserEntity> {
     AuthTokenVo login(LoginRequest request);
 
     /**
+     * 使用Refresh Token轮换登录令牌。
+     *
+     * @param request Refresh Token刷新请求
+     * @return 新的双令牌信息
+     */
+    AuthTokenVo refresh(RefreshTokenRequest request);
+
+    /**
      * 使用已验证的验证码重置密码。
      *
      * @param request 密码重置请求
@@ -69,7 +77,9 @@ public interface AuthService extends IService<UserEntity> {
     void resetPassword(ResetPasswordRequest request);
 
     /**
-     * 清理当前请求的登录上下文。
+     * 撤销当前登录会话的Refresh Token并清理登录上下文。
+     *
+     * @param request 当前登录会话的Refresh Token请求
      */
-    void logout();
+    void logout(RefreshTokenRequest request);
 }

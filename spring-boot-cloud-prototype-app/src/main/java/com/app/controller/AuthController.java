@@ -74,6 +74,17 @@ public class AuthController {
     }
 
     /**
+     * 使用Refresh Token换取新的双令牌。
+     *
+     * @param request Refresh Token刷新请求
+     * @return 新的访问令牌和刷新令牌
+     */
+    @PostMapping("/refresh")
+    public CommonResult<AuthTokenVo> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        return CommonResult.success(authService.refresh(request));
+    }
+
+    /**
      * 发送密码重置验证码。
      *
      * @param request     密码重置验证码请求
@@ -111,13 +122,14 @@ public class AuthController {
     }
 
     /**
-     * 清理当前请求的登录上下文。
+     * 撤销当前登录会话的Refresh Token并清理登录上下文。
      *
+     * @param request 当前登录会话的Refresh Token请求
      * @return 空数据成功响应
      */
     @PostMapping("/logout")
-    public CommonResult<Void> logout() {
-        authService.logout();
+    public CommonResult<Void> logout(@RequestBody(required = false) RefreshTokenRequest request) {
+        authService.logout(request);
         return CommonResult.success(null);
     }
 }

@@ -16,6 +16,9 @@ public final class RedisKeyConstants {
     /** 验证码已验证状态键后缀。 */
     public static final String AUTH_CODE_VERIFIED_SUFFIX = ":verified";
 
+    /** Refresh Token会话键前缀。 */
+    public static final String REFRESH_TOKEN_PREFIX = "auth:refresh:";
+
     private RedisKeyConstants() {
     }
 }

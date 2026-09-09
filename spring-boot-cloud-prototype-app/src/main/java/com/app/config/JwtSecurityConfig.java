@@ -34,7 +34,7 @@ public class JwtSecurityConfig {
                 registry.addInterceptor(new RateLimitInterceptor(rateLimiter)).addPathPatterns("/api/**");
                 registry.addInterceptor(new JwtAuthenticationInterceptor(jwtTokenService)).addPathPatterns("/api/**")
                         .excludePathPatterns("/api/auth/login", "/api/auth/register", "/api/auth/sendRegisterCode", "/api/auth/verifyRegisterCode",
-                                "/api/auth/sendResetPasswordCode", "/api/auth/verifyResetPasswordCode", "/api/auth/resetPassword",
+                                "/api/auth/sendResetPasswordCode", "/api/auth/verifyResetPasswordCode", "/api/auth/resetPassword", "/api/auth/refresh",
                                 "/api/ossCallback/uploadCompleted", "/error");
             }
         };
