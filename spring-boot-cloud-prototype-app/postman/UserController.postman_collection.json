@@ -1,0 +1,35 @@
+{
+  "info": {
+    "_postman_id": "user-controller-collection",
+    "name": "UserController",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8081/app"},
+    {"key": "accessToken", "value": "[REDACTED]"}
+  ],
+  "item": [
+    {
+      "name": "getProfile",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+        "url": "{{baseUrl}}/api/user/getProfile"
+      },
+      "response": []
+    },
+    {
+      "name": "updateLanguage",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{accessToken}}"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {"mode": "raw", "raw": "{\n  \"language\": \"zh-CN\"\n}", "options": {"raw": {"language": "json"}}},
+        "url": "{{baseUrl}}/api/user/updateLanguage"
+      },
+      "response": []
+    }
+  ]
+}
