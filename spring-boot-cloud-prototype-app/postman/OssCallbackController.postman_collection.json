@@ -1,0 +1,18 @@
+{
+  "info": {
+    "_postman_id": "oss-callback-controller-collection",
+    "name": "OssCallbackController",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [{"key": "baseUrl", "value": "http://localhost:8081/app"}],
+  "item": [{
+    "name": "uploadCompleted",
+    "request": {
+      "method": "POST",
+      "header": [{"key": "Content-Type", "value": "application/json"}],
+      "body": {"mode": "raw", "raw": "{\n  \"photoFileId\": 1,\n  \"objectKey\": \"original/1/example.jpg\",\n  \"sizeBytes\": 1048576,\n  \"mimeType\": \"image/jpeg\",\n  \"eventId\": \"event-example\"\n}", "options": {"raw": {"language": "json"}}},
+      "url": "{{baseUrl}}/api/ossCallback/uploadCompleted"
+    },
+    "response": []
+  }]
+}

@@ -44,6 +44,12 @@
         ORDER BY create_time ASC LIMIT 100
     </select>
 
+    <select id="selectAvailableByUserId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_photo_file
+        WHERE user_id = #{userId} AND status = 'AVAILABLE'
+        ORDER BY uploaded_time DESC, id DESC
+    </select>
+
     <update id="updateStatusById">
         UPDATE t_photo_file SET status = #{status}, update_time = CURRENT_TIMESTAMP(3) WHERE id = #{id} AND status = #{expectedStatus}
     </update>

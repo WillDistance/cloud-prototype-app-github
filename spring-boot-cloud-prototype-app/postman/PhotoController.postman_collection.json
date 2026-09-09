@@ -1,0 +1,20 @@
+{
+  "info": {
+    "_postman_id": "photo-controller-collection",
+    "name": "PhotoController",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8081/app"},
+    {"key": "accessToken", "value": "[REDACTED]"}
+  ],
+  "item": [{
+    "name": "listPhotos",
+    "request": {
+      "method": "GET",
+      "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+      "url": "{{baseUrl}}/api/photo/listPhotos"
+    },
+    "response": []
+  }]
+}

@@ -43,4 +43,12 @@ public interface PhotoFileMapper extends BaseMapper<PhotoFileEntity> {
      * @return 受影响的记录数
      */
     int updateStatusById(@Param("id") Long id, @Param("status") String status, @Param("expectedStatus") String expectedStatus);
+
+    /**
+     * 查询指定用户的可访问照片文件。
+     *
+     * @param userId 用户ID
+     * @return 可访问照片文件列表
+     */
+    List<PhotoFileEntity> selectAvailableByUserId(@Param("userId") Long userId);
 }

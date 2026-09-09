@@ -8,6 +8,7 @@ import com.app.exception.BusinessException;
 import com.app.mapper.DeviceBindingMapper;
 import com.app.mapper.DeviceMapper;
 import com.app.mapper.PhotoFileMapper;
+import com.app.mapper.PlatformConfigMapper;
 import com.app.mapper.UserStorageAccountMapper;
 import com.app.pojo.dto.DeviceUploadRequest;
 import com.app.pojo.entity.DeviceEntity;
@@ -28,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Arrays;
+import java.util.Locale;
 
 /**
  * 设备上传业务实现。
@@ -53,6 +56,8 @@ public class DeviceUploadServiceImpl extends ServiceImpl<PhotoFileMapper, PhotoF
     private ObsFileService obsFileService;
     @Autowired
     private ObsProperties obsProperties;
+    @Autowired
+    private PlatformConfigMapper platformConfigMapper;
 
     @Override
     @Transactional
@@ -64,6 +69,7 @@ public class DeviceUploadServiceImpl extends ServiceImpl<PhotoFileMapper, PhotoF
         if (!passwordEncoder.matches(request.getPassword(), device.getInitialPasswordHash())) {
             throw new BusinessException(ErrorCodeEnum.DEVICE_CREDENTIAL_INVALID);
         }
+        validateFileType(request.getExtension(), request.getMimeType());
         DeviceBindingEntity binding = bindingMapper.selectByDeviceId(device.getId());
         if (binding == null || !binding.getDeviceId().equals(device.getId())) {
             throw new BusinessException(ErrorCodeEnum.DEVICE_BINDING_NOT_FOUND);
@@ -87,5 +93,42 @@ public class DeviceUploadServiceImpl extends ServiceImpl<PhotoFileMapper, PhotoF
         String uploadUrl = obsFileService.generateUploadPresignedUrl(obsProperties.getBucketName(), objectKey, UPLOAD_URL_TTL,
                 Map.of(), Map.of("Content-Type", request.getMimeType()));
         return new DeviceUploadVo(photo.getId(), objectKey, uploadUrl, "PUT", Map.of("Content-Type", request.getMimeType()), expireTime);
+    }
+
+    /**
+     * 根据当前平台配置校验文件扩展名和MIME类型，确保预签名请求只允许上传受支持的文件。
+     *
+     * @param extension 文件扩展名
+     * @param mimeType 文件MIME类型
+     */
+    private void validateFileType(String extension, String mimeType) {
+        var config = platformConfigMapper.selectActive();
+        if (config == null || config.getAllowedExtensions() == null) {
+            throw new BusinessException(ErrorCodeEnum.PHOTO_FILE_INVALID);
+        }
+        String normalizedExtension = extension.trim().toLowerCase(Locale.ROOT);
+        String normalizedMimeType = mimeType.trim().toLowerCase(Locale.ROOT);
+        boolean supported = Arrays.stream(config.getAllowedExtensions().replace("[", "").replace("]", "").replace("\"", "").split(","))
+                .map(value -> value.trim().toLowerCase(Locale.ROOT))
+                .anyMatch(value -> value.equals(normalizedExtension));
+        if (!supported || !mimeTypeMatchesExtension(normalizedExtension, normalizedMimeType)) {
+            throw new BusinessException(ErrorCodeEnum.PHOTO_FILE_INVALID);
+        }
+    }
+
+    /**
+     * 校验扩展名与声明的MIME类型是否匹配。
+     *
+     * @param extension 标准化扩展名
+     * @param mimeType 标准化MIME类型
+     * @return 是否匹配
+     */
+    private boolean mimeTypeMatchesExtension(String extension, String mimeType) {
+        return switch (extension) {
+            case "jpg", "jpeg" -> "image/jpeg".equals(mimeType);
+            case "png" -> "image/png".equals(mimeType);
+            case "heic" -> "image/heic".equals(mimeType);
+            default -> false;
+        };
     }
 }

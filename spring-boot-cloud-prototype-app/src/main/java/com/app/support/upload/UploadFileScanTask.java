@@ -30,7 +30,6 @@ import java.util.List;
  */
 @Component
 public class UploadFileScanTask {
-    private static final LocalDateTime MIN_TIME = LocalDateTime.of(1970, 1, 1, 0, 0);
 
     @Autowired
     private PhotoFileMapper photoFileMapper;
@@ -57,12 +56,27 @@ public class UploadFileScanTask {
      *
      * @param photo 待检查的原图记录
      */
-    protected void processPendingPhoto(PhotoFileEntity photo) {
-        FileMetadata metadata = obsFileService.statObject(obsProperties.getBucketName(), photo.getObjectKey());
-        if (metadata == null) {
+    public void processPendingPhoto(PhotoFileEntity photo) {
+        boolean exists;
+        try {
+            exists = obsFileService.existObject(obsProperties.getBucketName(), photo.getObjectKey());
+        } catch (RuntimeException exception) {
+            // 对象存储暂时不可用时保留记录，等待下一轮扫描，避免误删上传记录。
+            return;
+        }
+        if (!exists) {
             if (photo.getUploadUrlExpireTime().isBefore(LocalDateTime.now().minusMinutes(30))) {
                 cleanupExpiredPhoto(photo);
             }
+            return;
+        }
+        FileMetadata metadata;
+        try {
+            metadata = obsFileService.statObject(obsProperties.getBucketName(), photo.getObjectKey());
+        } catch (RuntimeException exception) {
+            return;
+        }
+        if (metadata == null) {
             return;
         }
         if (metadata.getSize() != photo.getSizeBytes() || !photo.getMimeType().equalsIgnoreCase(metadata.getContentType())) {
@@ -150,8 +164,11 @@ public class UploadFileScanTask {
     @Transactional
     protected void cleanupExpiredPhoto(PhotoFileEntity photo) {
         try {
-            obsFileService.removeObject(obsProperties.getBucketName(), photo.getObjectKey());
+            if (obsFileService.existObject(obsProperties.getBucketName(), photo.getObjectKey())) {
+                obsFileService.removeObject(obsProperties.getBucketName(), photo.getObjectKey());
+            }
         } catch (Exception ignored) {
+            // 对象删除失败时保留数据库记录，下一轮任务继续重试，避免容量账目不一致。
             return;
         }
         photoFileMapper.deleteById(photo.getId());
