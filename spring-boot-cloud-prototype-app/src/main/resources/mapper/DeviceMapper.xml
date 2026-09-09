@@ -23,6 +23,10 @@
         SELECT <include refid="Base_Column_List"/> FROM t_device WHERE id = #{id} FOR UPDATE
     </select>
 
+    <select id="selectByDeviceId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_device WHERE device_id = #{deviceId} LIMIT 1
+    </select>
+
     <update id="updateStatusById">
         UPDATE t_device SET status = #{status}, update_time = CURRENT_TIMESTAMP(3) WHERE id = #{id} AND status = #{expectedStatus}
     </update>

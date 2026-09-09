@@ -23,4 +23,8 @@
         SELECT <include refid="Base_Column_List"/> FROM t_user_storage_account WHERE id = #{id} FOR UPDATE
     </select>
 
+    <select id="selectByUserIdForUpdate" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_user_storage_account WHERE user_id = #{userId} FOR UPDATE
+    </select>
+
 </mapper>

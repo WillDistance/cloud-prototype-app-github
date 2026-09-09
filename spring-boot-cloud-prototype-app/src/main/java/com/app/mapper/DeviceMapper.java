@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 /**
- * t_device表数据访问接口
+ * t_device表数据访问接口。
  *
  * @author yanlei
  * @since 2026-09-09
@@ -14,32 +14,27 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface DeviceMapper extends BaseMapper<DeviceEntity> {
     /**
-     * 按主键查询并锁定数据库记录。
+     * 按主键查询并锁定设备记录，供并发绑定事务校验当前状态。
      *
      * @param id 设备记录主键ID
-     * @return 查询结果
-     */
-    /**
-     * 执行数据库查询操作。
-     *
-     * @param id 数据库查询参数
-     * @return 数据库查询结果
+     * @return 被锁定的设备记录，不存在时返回null
      */
     DeviceEntity selectByIdForUpdate(Long id);
+
     /**
-     * 在期望状态匹配时原子更新记录状态。
+     * 根据设备业务编号查询设备记录。
      *
-     * @param id 数据库记录主键ID
-     * @param status 目标状态
-     * @param expectedStatus 期望的当前状态
-     * @return 受影响的记录数
+     * @param deviceId 设备业务编号
+     * @return 设备记录，不存在时返回null
      */
+    DeviceEntity selectByDeviceId(@Param("deviceId") String deviceId);
+
     /**
-     * 执行数据库更新操作。
+     * 在设备当前状态符合预期时原子更新设备状态。
      *
-     * @param id             数据库查询参数
-     * @param status         数据库查询参数
-     * @param expectedStatus 数据库查询参数
+     * @param id 设备记录主键ID
+     * @param status 要更新成的设备状态
+     * @param expectedStatus 允许执行更新的当前设备状态
      * @return 受影响的记录数
      */
     int updateStatusById(@Param("id") Long id, @Param("status") String status, @Param("expectedStatus") String expectedStatus);

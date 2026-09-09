@@ -26,6 +26,10 @@
         SELECT <include refid="Base_Column_List"/> FROM t_platform_config WHERE id = #{id} FOR UPDATE
     </select>
 
+    <select id="selectActive" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_platform_config WHERE status = 'ACTIVE' LIMIT 1
+    </select>
+
     <update id="updateStatusById">
         UPDATE t_platform_config SET status = #{status}, update_time = CURRENT_TIMESTAMP(3) WHERE id = #{id} AND status = #{expectedStatus}
     </update>
