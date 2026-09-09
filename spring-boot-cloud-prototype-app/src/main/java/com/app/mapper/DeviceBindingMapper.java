@@ -30,6 +30,14 @@ public interface DeviceBindingMapper extends BaseMapper<DeviceBindingEntity> {
     DeviceBindingEntity selectByUserId(@Param("userId") Long userId);
 
     /**
+     * 根据设备主键查询永久绑定关系。
+     *
+     * @param deviceId 设备表主键ID
+     * @return 设备绑定记录，不存在时返回null
+     */
+    DeviceBindingEntity selectByDeviceId(@Param("deviceId") Long deviceId);
+
+    /**
      * 在绑定记录当前状态符合预期时原子更新绑定状态。
      *
      * @param id 设备绑定记录主键ID

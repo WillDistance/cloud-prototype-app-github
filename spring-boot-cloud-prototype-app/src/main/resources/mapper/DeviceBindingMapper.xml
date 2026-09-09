@@ -28,6 +28,10 @@
         SELECT <include refid="Base_Column_List"/> FROM t_device_binding WHERE user_id = #{userId} LIMIT 1
     </select>
 
+    <select id="selectByDeviceId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_device_binding WHERE device_id = #{deviceId} LIMIT 1
+    </select>
+
     <update id="updateStatusById">
         UPDATE t_device_binding SET status = #{status}, update_time = CURRENT_TIMESTAMP(3) WHERE id = #{id} AND status = #{expectedStatus}
     </update>

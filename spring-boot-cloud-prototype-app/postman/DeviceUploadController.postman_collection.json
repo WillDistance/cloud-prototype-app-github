@@ -1,0 +1,22 @@
+{
+  "info": {
+    "_postman_id": "device-upload-controller-collection",
+    "name": "DeviceUploadController",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8081/app"}
+  ],
+  "item": [
+    {
+      "name": "createUploadSession",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\n  \"deviceId\": \"CC-2026-AB12-8A2F\",\n  \"password\": \"[REDACTED]\",\n  \"fileName\": \"photo.jpg\",\n  \"extension\": \"jpg\",\n  \"mimeType\": \"image/jpeg\",\n  \"sizeBytes\": 1048576\n}", "options": {"raw": {"language": "json"}}},
+        "url": "{{baseUrl}}/api/deviceUpload/createUploadSession"
+      },
+      "response": []
+    }
+  ]
+}

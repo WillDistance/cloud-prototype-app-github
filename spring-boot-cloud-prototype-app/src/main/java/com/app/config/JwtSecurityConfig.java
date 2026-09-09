@@ -35,7 +35,7 @@ public class JwtSecurityConfig {
                 registry.addInterceptor(new JwtAuthenticationInterceptor(jwtTokenService)).addPathPatterns("/api/**")
                         .excludePathPatterns("/api/auth/login", "/api/auth/register", "/api/auth/sendRegisterCode", "/api/auth/verifyRegisterCode",
                                 "/api/auth/sendResetPasswordCode", "/api/auth/verifyResetPasswordCode", "/api/auth/resetPassword", "/api/auth/refresh",
-                                "/api/ossCallback/uploadCompleted", "/error");
+                                "/api/deviceUpload/createUploadSession", "/api/ossCallback/uploadCompleted", "/error");
             }
         };
     }

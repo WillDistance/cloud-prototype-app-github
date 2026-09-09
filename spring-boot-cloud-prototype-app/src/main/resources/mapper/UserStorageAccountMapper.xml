@@ -27,4 +27,22 @@
         SELECT <include refid="Base_Column_List"/> FROM t_user_storage_account WHERE user_id = #{userId} FOR UPDATE
     </select>
 
+    <update id="increaseReservedBytes">
+        UPDATE t_user_storage_account
+        SET reserved_bytes = reserved_bytes + #{bytes}, update_time = CURRENT_TIMESTAMP(3)
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="decreaseReservedBytes">
+        UPDATE t_user_storage_account
+        SET reserved_bytes = reserved_bytes - #{bytes}, update_time = CURRENT_TIMESTAMP(3)
+        WHERE user_id = #{userId} AND reserved_bytes >= #{bytes}
+    </update>
+
+    <update id="increaseUsedBytes">
+        UPDATE t_user_storage_account
+        SET used_bytes = used_bytes + #{bytes}, update_time = CURRENT_TIMESTAMP(3)
+        WHERE user_id = #{userId}
+    </update>
+
 </mapper>

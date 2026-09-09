@@ -3,6 +3,8 @@ package com.app.service.impl;
 import com.app.enums.BindingStatusEnum;
 import com.app.enums.DeviceStatusEnum;
 import com.app.enums.ErrorCodeEnum;
+import com.app.enums.EntitlementSourceTypeEnum;
+import com.app.enums.EntitlementStatusEnum;
 import com.app.exception.BusinessException;
 import com.app.mapper.DeviceBindingMapper;
 import com.app.mapper.DeviceMapper;
@@ -125,10 +127,10 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, DeviceEntity> i
         };
         LocalDateTime expireTime = localExpire.atZone(zone).withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime();
         return new StorageEntitlementEntity().setId(IdWorker.getId()).setEntitlementNo("ENT-" + IdWorker.getId())
-                .setUserId(userId).setSourceType("DEVICE_GIFT").setNameSnapshot("设备绑定赠送")
+                .setUserId(userId).setSourceType(EntitlementSourceTypeEnum.DEVICE_GIFT.getValue()).setNameSnapshot(EntitlementSourceTypeEnum.DEVICE_GIFT.getName())
                 .setCapacityBytes(config.getDeviceGiftCapacityBytes()).setDurationValue(config.getDeviceGiftDurationValue())
                 .setDurationUnit(config.getDeviceGiftDurationUnit()).setUserTimeZoneSnapshot(zone.getId())
-                .setEffectiveTime(effectiveTime).setExpireTime(expireTime).setStatus("ACTIVE");
+                .setEffectiveTime(effectiveTime).setExpireTime(expireTime).setStatus(EntitlementStatusEnum.ACTIVE.getValue());
     }
 
     /**

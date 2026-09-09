@@ -28,4 +28,31 @@ public interface UserStorageAccountMapper extends BaseMapper<UserStorageAccountE
      * @return 被锁定的存储账户，不存在时返回null
      */
     UserStorageAccountEntity selectByUserIdForUpdate(@Param("userId") Long userId);
+
+    /**
+     * 在预留容量足够时原子增加用户存储预留容量。
+     *
+     * @param userId 用户ID
+     * @param bytes 待增加的预留容量，单位为字节
+     * @return 受影响的账户记录数
+     */
+    int increaseReservedBytes(@Param("userId") Long userId, @Param("bytes") Long bytes);
+
+    /**
+     * 原子减少用户存储预留容量。
+     *
+     * @param userId 用户ID
+     * @param bytes 待释放的预留容量，单位为字节
+     * @return 受影响的账户记录数
+     */
+    int decreaseReservedBytes(@Param("userId") Long userId, @Param("bytes") Long bytes);
+
+    /**
+     * 增加用户已确认使用容量。
+     *
+     * @param userId 用户ID
+     * @param bytes 已确认增加的容量，单位为字节
+     * @return 受影响的账户记录数
+     */
+    int increaseUsedBytes(@Param("userId") Long userId, @Param("bytes") Long bytes);
 }

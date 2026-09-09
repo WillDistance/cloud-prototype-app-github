@@ -32,6 +32,18 @@
         SELECT <include refid="Base_Column_List"/> FROM t_photo_file WHERE id = #{id} FOR UPDATE
     </select>
 
+    <select id="selectExpiredUploads" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_photo_file
+        WHERE status = #{status} AND upload_url_expire_time &lt; #{expireTime}
+        ORDER BY upload_url_expire_time ASC LIMIT 100
+    </select>
+
+    <select id="selectPendingUploads" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_photo_file
+        WHERE status = #{status} AND file_type = 'ORIGINAL'
+        ORDER BY create_time ASC LIMIT 100
+    </select>
+
     <update id="updateStatusById">
         UPDATE t_photo_file SET status = #{status}, update_time = CURRENT_TIMESTAMP(3) WHERE id = #{id} AND status = #{expectedStatus}
     </update>
