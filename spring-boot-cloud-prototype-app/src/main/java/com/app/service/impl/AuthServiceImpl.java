@@ -14,7 +14,6 @@ import com.app.pojo.entity.UserEntity;
 import com.app.pojo.entity.UserStorageAccountEntity;
 import com.app.pojo.vo.AuthTokenVo;
 import com.app.pojo.vo.UserVo;
-import com.app.pojo.vo.UserProfileVo;
 import com.app.security.JwtTokenService;
 import com.app.security.RefreshTokenService;
 import com.app.service.AuthService;
@@ -164,19 +163,6 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
     @Override
-    public UserProfileVo getProfile() {
-        UserEntity user = currentUser();
-        return new UserProfileVo(user.getId(), user.getEmail(), user.getTimeZone(), user.getPreferredLanguage());
-    }
-
-    @Override
-    public void updateLanguage(LanguageUpdateRequest request) {
-        String language = normalizeLanguage(request.getLanguage());
-        UserEntity user = currentUser();
-        userMapper.updatePreferredLanguage(user.getId(), language);
-    }
-
-    @Override
     public AuthTokenVo login(LoginRequest request) {
         UserEntity user = userMapper.selectByEmail(normalizeEmail(request.getEmail()));
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
@@ -257,34 +243,6 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      */
     private String normalizeEmail(String email) {
         return email.trim().toLowerCase(Locale.ROOT);
-    }
-
-    /**
-     * 读取当前登录用户并校验用户记录仍然存在。
-     *
-     * @return 当前用户实体
-     */
-    private UserEntity currentUser() {
-        UserEntity user = userMapper.selectById(UserContextHolderUtil.getUserId());
-        if (user == null) {
-            throw new AuthenticationException(ErrorCodeEnum.AUTH_REQUIRED);
-        }
-        return user;
-    }
-
-    /**
-     * 将语言代码规范化为系统枚举中的标准值。
-     *
-     * @param language 待规范化的语言代码
-     * @return 标准语言代码
-     */
-    private String normalizeLanguage(String language) {
-        for (LanguageEnum item : LanguageEnum.values()) {
-            if (item.getValue().equalsIgnoreCase(language)) {
-                return item.getValue();
-            }
-        }
-        throw new RequestParameterException(ErrorCodeEnum.USER_LANGUAGE_UNSUPPORTED);
     }
 
     /**

@@ -4,7 +4,6 @@ import com.app.pojo.dto.*;
 import com.app.pojo.entity.UserEntity;
 import com.app.pojo.vo.AuthTokenVo;
 import com.app.pojo.vo.UserVo;
-import com.app.pojo.vo.UserProfileVo;
 import com.baomidou.mybatisplus.spring.service.IService;
 
 /**
@@ -53,20 +52,6 @@ public interface AuthService extends IService<UserEntity> {
      * @return 注册用户资料
      */
     UserVo register(RegisterRequest request, String timeZone, String language);
-
-    /**
-     * 查询当前登录用户资料。
-     *
-     * @return 当前用户的邮箱、时区和语言偏好
-     */
-    UserProfileVo getProfile();
-
-    /**
-     * 更新当前登录用户的通知语言偏好。
-     *
-     * @param request 语言偏好更新请求
-     */
-    void updateLanguage(LanguageUpdateRequest request);
 
     /**
      * 校验用户登录信息并签发JWT访问令牌。

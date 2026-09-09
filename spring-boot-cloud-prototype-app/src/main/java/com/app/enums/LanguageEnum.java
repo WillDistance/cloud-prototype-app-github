@@ -8,8 +8,8 @@ package com.app.enums;
  */
 public enum LanguageEnum {
     ZH_CN("zh-CN", "简体中文"),
-    EN("en", "英语"),
-    DE("de", "德语");
+    EN("EN", "英语"),
+    DE("DE", "德语");
     private final String value;
 
     /** 枚举中文名称 */

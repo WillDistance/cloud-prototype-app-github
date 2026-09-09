@@ -52,13 +52,4 @@ public interface UserMapper extends BaseMapper<UserEntity> {
      * @return 受影响的记录数
      */
     int updateLastLogin(@Param("id") Long id);
-
-    /**
-     * 更新用户的通知语言偏好。
-     *
-     * @param id 用户ID
-     * @param preferredLanguage 语言代码
-     * @return 实际更新的记录数
-     */
-    int updatePreferredLanguage(@Param("id") Long id, @Param("preferredLanguage") String preferredLanguage);
 }

@@ -1,10 +1,11 @@
 package com.app.security;
 
 import cn.hutool.crypto.digest.DigestUtil;
-import com.alibaba.fastjson2.JSON;
 import com.app.constants.RedisKeyConstants;
 import com.app.enums.ErrorCodeEnum;
 import com.app.exception.AuthenticationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -29,7 +30,8 @@ public class RefreshTokenService {
     private final SecureRandom secureRandom = new SecureRandom();
     @Autowired
     private StringRedisTemplate redis;
-
+    @Autowired
+    private ObjectMapper objectMapper;
     @Value("${security.refresh-token.ttl:PT30D}")
     private Duration refreshTokenTtl;
 
@@ -117,8 +119,8 @@ public class RefreshTokenService {
      */
     private void save(RefreshTokenSession session) {
         try {
-            redis.opsForValue().set(key(session.getTokenHash()), JSON.toJSONString(session), refreshTokenTtl);
-        } catch (RuntimeException exception) {
+            redis.opsForValue().set(key(session.getTokenHash()), objectMapper.writeValueAsString(session), refreshTokenTtl);
+        } catch (JsonProcessingException exception) {
             throw new IllegalStateException("Refresh Token会话序列化失败", exception);
         }
     }
@@ -134,8 +136,8 @@ public class RefreshTokenService {
             return null;
         }
         try {
-            return JSON.parseObject(json, RefreshTokenSession.class);
-        } catch (RuntimeException exception) {
+            return objectMapper.readValue(json, RefreshTokenSession.class);
+        } catch (JsonProcessingException exception) {
             return null;
         }
     }

@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 2022-09-24
  */
 @Data
-@Configuration
+@Configuration(value = "myObsProperties")
 @ConfigurationProperties(prefix = "obs")
 public class ObsProperties {
 
