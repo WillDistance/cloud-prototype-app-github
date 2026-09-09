@@ -1,5 +1,6 @@
 package com.app.interceptors;
 
+import com.app.constants.RedisKeyConstants;
 import com.app.enums.ErrorCodeEnum;
 import com.app.exception.BusinessException;
 import com.app.support.ratelimit.RateLimiter;
@@ -28,7 +29,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         String category = category(uri);
         String ip = request.getRemoteAddr() == null ? "unknown" : request.getRemoteAddr();
         int limit = "auth".equals(category) ? 30 : "callback".equals(category) ? 120 : 300;
-        if (!rateLimiter.tryAcquire(category + ":ip:" + ip, limit, Duration.ofMinutes(1))) {
+        if (!rateLimiter.tryAcquire(category + RedisKeyConstants.RATE_LIMIT_IP_SUFFIX + ip, limit, Duration.ofMinutes(1))) {
             throw new BusinessException(ErrorCodeEnum.SYSTEM_BUSY);
         }
         return true;
