@@ -1,8 +1,10 @@
 package com.app.service;
 
 import com.app.pojo.dto.*;
+import com.app.pojo.entity.UserEntity;
 import com.app.pojo.vo.AuthTokenVo;
 import com.app.pojo.vo.UserVo;
+import com.baomidou.mybatisplus.spring.service.IService;
 
 /**
  * 用户认证业务。
@@ -10,7 +12,7 @@ import com.app.pojo.vo.UserVo;
  * @author yanlei
  * @since 2026-09-09
  */
-public interface AuthService {
+public interface AuthService extends IService<UserEntity> {
     /**
      * 生成并发送注册验证码。
      *

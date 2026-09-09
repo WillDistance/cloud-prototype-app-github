@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "10fd17e3-8905-4221-a49c-01dd17e20286",
+    "_postman_id": "a2f88051-2ae9-40fc-aba0-50f88f7f3ddb",
     "name": "TestController",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -15,15 +15,6 @@
             "value": "application/json"
           }
         ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"id\": 1212,\n  \"name\": \"demoData\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
         "url": {
           "raw": "http://localhost:8081/app/api/test/save",
           "protocol": "http",
@@ -37,6 +28,15 @@
             "test",
             "save"
           ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         }
       },
       "response": []
@@ -51,15 +51,6 @@
             "value": "application/json"
           }
         ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"id\": 1212\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
         "url": {
           "raw": "http://localhost:8081/app/api/test/delete",
           "protocol": "http",
@@ -73,6 +64,15 @@
             "test",
             "delete"
           ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         }
       },
       "response": []
@@ -87,15 +87,6 @@
             "value": "application/json"
           }
         ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"id\": 1212,\n  \"name\": \"demoDataUpdated\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
         "url": {
           "raw": "http://localhost:8081/app/api/test/update",
           "protocol": "http",
@@ -109,6 +100,15 @@
             "test",
             "update"
           ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         }
       },
       "response": []

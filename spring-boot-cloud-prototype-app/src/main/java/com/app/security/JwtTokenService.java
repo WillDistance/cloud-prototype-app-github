@@ -22,6 +22,12 @@ public class JwtTokenService {
     private final byte[] secret;
     private final Duration ttl;
 
+    /**
+     * 创建JWT令牌服务并校验签名密钥和令牌有效期配置。
+     *
+     * @param secret JWT签名密钥，至少需要32个字符
+     * @param ttl JWT令牌有效期
+     */
     public JwtTokenService(String secret, Duration ttl) {
         if (secret == null || secret.length() < 32) {
             throw new IllegalStateException("JWT_SECRET至少需要32个字符");
@@ -33,6 +39,13 @@ public class JwtTokenService {
         this.ttl = ttl;
     }
 
+    /**
+     * 根据用户身份和时区签发JWT令牌。
+     *
+     * @param userId 用户ID
+     * @param timeZone 用户保存的IANA时区
+     * @return 已签名的JWT字符串
+     */
     public String issue(Long userId, String timeZone) {
         long issuedAt = System.currentTimeMillis() / 1000;
         Map<String, Object> payload = new HashMap<>();
@@ -44,6 +57,13 @@ public class JwtTokenService {
         return JWTUtil.createToken(payload, secret);
     }
 
+    /**
+     * 使用签名密钥验证并解析JWT令牌，校验令牌载荷后构造认证用户上下文。
+     *
+     * @param token 待验证的JWT字符串
+     * @return 已认证用户信息，包含用户ID、时区和令牌ID
+     * @throws AuthenticationException 令牌签名无效、已过期或载荷不完整时抛出
+     */
     public AuthenticatedUser parse(String token) {
         try {
             if (!JWTUtil.verify(token, secret)) {

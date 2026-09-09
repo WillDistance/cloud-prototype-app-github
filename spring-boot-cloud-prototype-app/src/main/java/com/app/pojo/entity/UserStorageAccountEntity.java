@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 @TableName("t_user_storage_account")
-public class UserStorageAccountEntity {
+public class UserStorageAccountEntity extends BaseField {
     /** 主键ID */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
@@ -38,20 +38,7 @@ public class UserStorageAccountEntity {
     @TableField("lock_version")
     private Long lockVersion;
 
-    /** 创建人 */
-    @TableField("create_by")
-    private String createBy;
 
-    /** 创建时间(UTC，带毫秒) */
-    @TableField("create_time")
-    private LocalDateTime createTime;
 
-    /** 更新人 */
-    @TableField("update_by")
-    private String updateBy;
-
-    /** 更新时间(UTC，带毫秒) */
-    @TableField("update_time")
-    private LocalDateTime updateTime;
 
 }

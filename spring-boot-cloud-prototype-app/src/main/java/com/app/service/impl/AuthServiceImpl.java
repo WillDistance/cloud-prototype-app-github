@@ -1,6 +1,5 @@
 package com.app.service.impl;
 
-import com.app.constants.RedisKeyConstants;
 import com.app.enums.*;
 import com.app.exception.AuthenticationException;
 import com.app.exception.BusinessException;
@@ -19,6 +18,7 @@ import com.app.service.AuthService;
 import com.app.support.auth.VerificationCodeSender;
 import com.app.utils.UserContextHolderUtil;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,7 +35,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * 认证业务实现。
  */
 @Service
-public class AuthServiceImpl implements AuthService {
+public class AuthServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements AuthService {
     private static final Duration CODE_TTL = Duration.ofMinutes(5);
     private static final Duration SEND_INTERVAL = Duration.ofSeconds(60);
     private static final int MAX_FAILURES = 5;
@@ -81,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(ErrorCodeEnum.AUTH_INVALID_CREDENTIALS);
         }
         String key = key(email, purpose);
-        Boolean available = redis.opsForValue().setIfAbsent(key + RedisKeyConstants.AUTH_CODE_COOLDOWN_SUFFIX, "1", SEND_INTERVAL);
+        Boolean available = redis.opsForValue().setIfAbsent(key + ":cooldown", "1", SEND_INTERVAL);
         if (Boolean.FALSE.equals(available)) {
             throw new BusinessException(ErrorCodeEnum.AUTH_CODE_SEND_TOO_FREQUENT);
         }
@@ -125,8 +125,8 @@ public class AuthServiceImpl implements AuthService {
         }
         codeMapper.markVerified(record.getId());
         redis.delete(key(email, purpose));
-        redis.delete(key(email, purpose) + RedisKeyConstants.AUTH_CODE_COOLDOWN_SUFFIX);
-        redis.opsForValue().set(key(email, purpose) + RedisKeyConstants.AUTH_CODE_VERIFIED_SUFFIX, "1", CODE_TTL);
+        redis.delete(key(email, purpose) + ":cooldown");
+        redis.opsForValue().set(key(email, purpose) + ":verified", "1", CODE_TTL);
     }
 
     @Override
@@ -144,9 +144,17 @@ public class AuthServiceImpl implements AuthService {
         }
         consumeVerified(email, VerificationPurposeEnum.REGISTER.getValue());
         LocalDateTime now = LocalDateTime.now();
-        UserEntity user = new UserEntity().setId(IdWorker.getId()).setEmail(email).setPasswordHash(passwordEncoder.encode(request.getPassword())).setTimeZone(zone.getId()).setPreferredLanguage(language).setStatus(UserStatusEnum.ACTIVE.getValue()).setPasswordUpdateTime(now).setCreateTime(now).setUpdateTime(now);
+        UserEntity user = new UserEntity();
+        user.setId(IdWorker.getId()).setEmail(email).setPasswordHash(passwordEncoder.encode(request.getPassword()))
+                .setTimeZone(zone.getId()).setPreferredLanguage(language).setStatus(UserStatusEnum.ACTIVE.getValue())
+                .setPasswordUpdateTime(now);
+        user.setCreateTime(now).setUpdateTime(now);
         userMapper.insert(user);
-        storageMapper.insert(new UserStorageAccountEntity().setId(IdWorker.getId()).setUserId(user.getId()).setUsedBytes(0L).setReservedBytes(0L).setLockVersion(0L).setCreateTime(now).setUpdateTime(now));
+        UserStorageAccountEntity account = new UserStorageAccountEntity();
+        account.setId(IdWorker.getId()).setUserId(user.getId()).setUsedBytes(0L)
+                .setReservedBytes(0L).setLockVersion(0L);
+        account.setCreateTime(now).setUpdateTime(now);
+        storageMapper.insert(account);
         return new UserVo(user.getId(), user.getEmail(), user.getTimeZone(), user.getPreferredLanguage());
     }
 
@@ -190,7 +198,7 @@ public class AuthServiceImpl implements AuthService {
      * @param purpose 验证码用途
      */
     private void consumeVerified(String email, String purpose) {
-        String k = key(email, purpose) + RedisKeyConstants.AUTH_CODE_VERIFIED_SUFFIX;
+        String k = key(email, purpose) + ":verified";
         if (!Boolean.TRUE.equals(redis.hasKey(k))) {
             throw new BusinessException(ErrorCodeEnum.AUTH_CODE_NOT_VERIFIED);
         }
@@ -215,7 +223,7 @@ public class AuthServiceImpl implements AuthService {
      * @return 规范化后的邮箱地址
      */
     private String key(String email, String purpose) {
-        return RedisKeyConstants.AUTH_CODE_PREFIX + purpose + ":" + email;
+        return "auth:code:" + purpose + ":" + email;
     }
 
     /**

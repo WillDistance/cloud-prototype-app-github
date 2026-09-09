@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 @TableName("t_email_verification_code")
-public class EmailVerificationCodeEntity {
+public class EmailVerificationCodeEntity extends BaseField {
     /** 主键ID */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
@@ -62,20 +62,7 @@ public class EmailVerificationCodeEntity {
     @TableField("request_ip")
     private String requestIp;
 
-    /** 创建人 */
-    @TableField("create_by")
-    private String createBy;
 
-    /** 创建时间(UTC，带毫秒) */
-    @TableField("create_time")
-    private LocalDateTime createTime;
 
-    /** 更新人 */
-    @TableField("update_by")
-    private String updateBy;
-
-    /** 更新时间(UTC，带毫秒) */
-    @TableField("update_time")
-    private LocalDateTime updateTime;
 
 }
