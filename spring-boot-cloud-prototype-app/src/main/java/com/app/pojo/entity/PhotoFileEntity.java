@@ -62,7 +62,7 @@ public class PhotoFileEntity extends BaseField {
     @TableField("object_key")
     private String objectKey;
 
-    /** 照片状态：URL_ISSUED=已签发上传链接，ORIGINAL_UPLOADED=原图上传回调成功，PROCESSING=派生图处理中，COMPLETED=处理完成，AVAILABLE=可访问，FAILED=处理失败，DELETE_PENDING=待永久删除，DELETE_FAILED=删除失败 */
+    /** 照片状态：URL_ISSUED=已签发上传链接，ORIGINAL_UPLOADED=原图上传回调成功，PROCESSING=派生图处理中，COMPLETED=处理完成，AVAILABLE=可访问，FAILED=处理失败，DELETE_PENDING=待永久删除，DELETE_FAILED=删除失败，DELETED=已删除 */
     @TableField("status")
     private String status;
 

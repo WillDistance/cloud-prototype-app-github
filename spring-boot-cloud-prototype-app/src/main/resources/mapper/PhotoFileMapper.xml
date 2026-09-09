@@ -50,6 +50,51 @@
         ORDER BY uploaded_time DESC, id DESC
     </select>
 
+    <select id="selectAvailableByCursor" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_photo_file
+        WHERE user_id = #{userId} AND status = 'AVAILABLE' AND file_type = 'ORIGINAL'
+        <if test="startTime != null">AND uploaded_time &gt;= #{startTime}</if>
+        <if test="endTime != null">AND uploaded_time &lt; #{endTime}</if>
+        <if test="cursorTime != null and cursorId != null">
+            AND (uploaded_time &lt; #{cursorTime} OR (uploaded_time = #{cursorTime} AND id &lt; #{cursorId}))
+        </if>
+        ORDER BY uploaded_time DESC, id DESC LIMIT #{limit}
+    </select>
+
+    <select id="selectAvailableOriginals" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_photo_file
+        WHERE user_id = #{userId} AND status = 'AVAILABLE' AND file_type = 'ORIGINAL'
+        ORDER BY uploaded_time ASC, id ASC
+    </select>
+
+    <select id="selectPhotoGroup" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_photo_file
+        WHERE user_id = #{userId}
+          AND object_key IN (
+              #{objectKey},
+              CONCAT(SUBSTRING_INDEX(#{objectKey}, '/', 2), '/thumbnail/', SUBSTRING_INDEX(#{objectKey}, '/', -1)),
+              CONCAT(SUBSTRING_INDEX(#{objectKey}, '/', 2), '/preview/', SUBSTRING_INDEX(#{objectKey}, '/', -1))
+          )
+    </select>
+
+    <update id="updateDeleteStatus">
+        UPDATE t_photo_file SET status = #{status}, delete_reason = #{reason}, update_time = CURRENT_TIMESTAMP(3)
+        WHERE id = #{id} AND status IN ('AVAILABLE', 'DELETE_PENDING', 'DELETE_FAILED')
+    </update>
+
+    <select id="selectByUserIdAndStatus" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_photo_file
+        WHERE user_id = #{userId} AND status = #{status}
+        ORDER BY uploaded_time ASC, id ASC
+    </select>
+
+    <select id="selectByStatus" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_photo_file
+        WHERE status = #{status}
+        ORDER BY update_time ASC, id ASC
+        LIMIT 100
+    </select>
+
     <update id="updateStatusById">
         UPDATE t_photo_file SET status = #{status}, update_time = CURRENT_TIMESTAMP(3) WHERE id = #{id} AND status = #{expectedStatus}
     </update>

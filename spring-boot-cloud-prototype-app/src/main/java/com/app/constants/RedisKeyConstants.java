@@ -19,6 +19,9 @@ public final class RedisKeyConstants {
     /** Refresh Token会话键前缀。 */
     public static final String REFRESH_TOKEN_PREFIX = "auth:refresh:";
 
+    /** 对象存储预签名下载地址缓存键前缀。 */
+    public static final String OBJECT_DOWNLOAD_URL_PREFIX = "oss:download:url:";
+
     private RedisKeyConstants() {
     }
 }

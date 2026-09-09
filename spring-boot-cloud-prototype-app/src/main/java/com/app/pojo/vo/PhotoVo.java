@@ -14,9 +14,18 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 public class PhotoVo {
+    /** 原图照片文件记录主键ID。 */
     private Long id;
+
+    /** 原始文件名称。 */
     private String fileName;
+
+    /** 文件版本类型。 */
     private String fileType;
-    private String objectKey;
+
+    /** 缩略图对象存储预签名访问地址。 */
+    private String thumbnailUrl;
+
+    /** 原图上传完成时间。 */
     private LocalDateTime uploadedTime;
 }

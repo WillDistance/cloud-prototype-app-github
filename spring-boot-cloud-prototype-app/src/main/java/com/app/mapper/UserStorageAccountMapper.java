@@ -30,6 +30,14 @@ public interface UserStorageAccountMapper extends BaseMapper<UserStorageAccountE
     UserStorageAccountEntity selectByUserIdForUpdate(@Param("userId") Long userId);
 
     /**
+     * 根据用户ID查询存储账户。
+     *
+     * @param userId 用户ID
+     * @return 用户存储账户，不存在时返回null
+     */
+    UserStorageAccountEntity selectByUserId(@Param("userId") Long userId);
+
+    /**
      * 在预留容量足够时原子增加用户存储预留容量。
      *
      * @param userId 用户ID
@@ -55,4 +63,13 @@ public interface UserStorageAccountMapper extends BaseMapper<UserStorageAccountE
      * @return 受影响的账户记录数
      */
     int increaseUsedBytes(@Param("userId") Long userId, @Param("bytes") Long bytes);
+
+    /**
+     * 减少用户已确认使用容量。
+     *
+     * @param userId 用户ID
+     * @param bytes 已确认减少的容量，单位为字节
+     * @return 受影响的账户记录数
+     */
+    int decreaseUsedBytes(@Param("userId") Long userId, @Param("bytes") Long bytes);
 }

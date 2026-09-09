@@ -1,4 +1,4 @@
-package com.app.support.auth;
+package com.app.support.notification;
 
 import org.springframework.stereotype.Component;
 

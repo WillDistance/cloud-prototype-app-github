@@ -17,7 +17,9 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class TestVo extends BaseField {
+    /** 主键id */
     private Long id;
 
+    /** 姓名 */
     private String name;
 }

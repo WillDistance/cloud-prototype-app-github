@@ -280,9 +280,10 @@ CREATE TABLE IF NOT EXISTS `t_photo_file` (
   `update_by` bigint unsigned DEFAULT NULL COMMENT '更新人用户ID',
   `update_time` datetime(3) NOT NULL COMMENT '更新时间(UTC，带毫秒)',
   PRIMARY KEY (`id`),
+  KEY `idx_uploaded_time` (`uploaded_time`) USING BTREE,
   UNIQUE KEY `uk_photo_file_object_key` (`object_key`),
   CONSTRAINT `chk_photo_file_type` CHECK (`file_type` IN ('ORIGINAL', 'THUMBNAIL', 'PREVIEW')),
-  CONSTRAINT `chk_photo_file_status` CHECK (`status` IN ('URL_ISSUED','ORIGINAL_UPLOADED','PROCESSING','COMPLETED','AVAILABLE', 'DELETE_PENDING', 'DELETE_FAILED')),
+  CONSTRAINT `chk_photo_file_status` CHECK (`status` IN ('URL_ISSUED','ORIGINAL_UPLOADED','PROCESSING','COMPLETED','AVAILABLE', 'DELETE_PENDING', 'DELETE_FAILED', 'DELETED')),
   CONSTRAINT `chk_photo_file_delete_reason` CHECK (`delete_reason` IS NULL OR `delete_reason` IN ('USER_MANUAL', 'ENTITLEMENT_EXPIRED'))
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='上传照片记录，原图及派生文件表';
 

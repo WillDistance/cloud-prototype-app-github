@@ -1,5 +1,7 @@
-package com.app.support.upload;
+package com.app.task;
 
+import com.app.constants.RedisKeyConstants;
+import com.app.enums.DeleteReasonEnum;
 import com.app.enums.PhotoFileStatusEnum;
 import com.app.enums.PhotoFileTypeEnum;
 import com.app.mapper.PhotoFileMapper;
@@ -11,11 +13,11 @@ import com.app.support.oss.ObsProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.imageio.ImageIO;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -39,6 +41,8 @@ public class UploadFileScanTask {
     private ObsFileService obsFileService;
     @Autowired
     private ObsProperties obsProperties;
+    @Autowired
+    private StringRedisTemplate redis;
 
     /**
      * 定时扫描待上传原图，处理已上传对象并清理长时间未完成的记录。
@@ -49,6 +53,52 @@ public class UploadFileScanTask {
         for (PhotoFileEntity photo : pending) {
             processPendingPhoto(photo);
         }
+        processDeletingPhotos();
+    }
+
+    /**
+     * 扫描待删除和删除失败的照片文件，异步清理对象存储文件。
+     */
+    private void processDeletingPhotos() {
+        List<PhotoFileEntity> pending = photoFileMapper.selectByStatus(PhotoFileStatusEnum.DELETE_PENDING.getValue());
+        pending.addAll(photoFileMapper.selectByStatus(PhotoFileStatusEnum.DELETE_FAILED.getValue()));
+        for (PhotoFileEntity photo : pending) {
+            if (PhotoFileTypeEnum.ORIGINAL.getValue().equals(photo.getFileType())) {
+                deletePhotoGroup(photo);
+            }
+        }
+    }
+
+    /**
+     * 删除一组照片对象，全部成功后更新删除状态并扣减原图容量。
+     *
+     * @param original 原图文件记录
+     */
+    @Transactional
+    protected void deletePhotoGroup(PhotoFileEntity original) {
+        List<PhotoFileEntity> group = photoFileMapper.selectPhotoGroup(original.getUserId(), original.getObjectKey());
+        boolean success = true;
+        for (PhotoFileEntity file : group) {
+            try {
+                if (obsFileService.existObject(obsProperties.getBucketName(), file.getObjectKey())) {
+                    obsFileService.removeObject(obsProperties.getBucketName(), file.getObjectKey());
+                }
+            } catch (Exception exception) {
+                success = false;
+                photoFileMapper.updateDeleteStatus(file.getId(), PhotoFileStatusEnum.DELETE_FAILED.getValue(),
+                        file.getDeleteReason() == null ? DeleteReasonEnum.USER_MANUAL.getValue() : file.getDeleteReason());
+            }
+        }
+        if (!success) {
+            photoFileMapper.updateDeleteStatus(original.getId(), PhotoFileStatusEnum.DELETE_FAILED.getValue(),
+                    original.getDeleteReason() == null ? DeleteReasonEnum.USER_MANUAL.getValue() : original.getDeleteReason());
+            return;
+        }
+        for (PhotoFileEntity file : group) {
+            photoFileMapper.updateDeleteStatus(file.getId(), PhotoFileStatusEnum.DELETED.getValue(), file.getDeleteReason());
+            redis.delete(RedisKeyConstants.OBJECT_DOWNLOAD_URL_PREFIX + file.getObjectKey());
+        }
+        storageAccountMapper.decreaseUsedBytes(original.getUserId(), original.getSizeBytes());
     }
 
     /**
@@ -172,6 +222,7 @@ public class UploadFileScanTask {
             return;
         }
         photoFileMapper.deleteById(photo.getId());
+        redis.delete(RedisKeyConstants.OBJECT_DOWNLOAD_URL_PREFIX + photo.getObjectKey());
         storageAccountMapper.decreaseReservedBytes(photo.getUserId(), photo.getSizeBytes());
     }
 }

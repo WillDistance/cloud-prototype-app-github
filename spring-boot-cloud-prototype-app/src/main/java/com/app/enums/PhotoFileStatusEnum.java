@@ -13,7 +13,8 @@ public enum PhotoFileStatusEnum {
     COMPLETED("COMPLETED", "处理完成"),
     AVAILABLE("AVAILABLE", "可访问"),
     DELETE_PENDING("DELETE_PENDING", "待删除"),
-    DELETE_FAILED("DELETE_FAILED", "删除失败");
+    DELETE_FAILED("DELETE_FAILED", "删除失败"),
+    DELETED("DELETED", "已删除");
     private final String value;
 
     /** 枚举中文名称 */

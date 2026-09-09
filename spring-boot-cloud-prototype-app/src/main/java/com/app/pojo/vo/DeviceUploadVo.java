@@ -15,10 +15,21 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 public class DeviceUploadVo {
+    /** 原图照片文件记录主键ID。 */
     private Long photoFileId;
+
+    /** MinIO对象路径。 */
     private String objectKey;
+
+    /** 临时上传预签名URL。 */
     private String uploadUrl;
+
+    /** 上传请求方法。 */
     private String method;
+
+    /** 上传时必须携带的请求头。 */
     private Map<String, String> headers;
+
+    /** 临时上传URL过期时间。 */
     private LocalDateTime expireTime;
 }

@@ -35,4 +35,10 @@
         UPDATE t_storage_plan SET status = #{status}, update_time = CURRENT_TIMESTAMP(3) WHERE id = #{id} AND status = #{expectedStatus}
     </update>
 
+    <select id="selectActivePlans" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_storage_plan
+        WHERE status = 'ACTIVE'
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
 </mapper>

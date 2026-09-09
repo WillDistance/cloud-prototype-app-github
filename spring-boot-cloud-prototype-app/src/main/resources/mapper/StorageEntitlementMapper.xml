@@ -36,4 +36,31 @@
         UPDATE t_storage_entitlement SET status = #{status}, update_time = CURRENT_TIMESTAMP(3) WHERE id = #{id} AND status = #{expectedStatus}
     </update>
 
+    <select id="selectActiveByUserId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_storage_entitlement
+        WHERE user_id = #{userId} AND status = 'ACTIVE' AND effective_time &lt;= #{now} AND expire_time &gt; #{now}
+        ORDER BY expire_time ASC, id ASC
+    </select>
+
+    <select id="selectExpired" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_storage_entitlement
+        WHERE status = 'ACTIVE' AND expire_time &lt;= #{now} AND expired_processed_time IS NULL
+        ORDER BY expire_time ASC, id ASC LIMIT 100
+    </select>
+
+    <select id="sumActiveCapacity" resultType="long">
+        SELECT COALESCE(SUM(capacity_bytes), 0) FROM t_storage_entitlement
+        WHERE user_id = #{userId} AND status = 'ACTIVE' AND effective_time &lt;= #{now} AND expire_time &gt; #{now}
+    </select>
+
+    <update id="markExpired">
+        UPDATE t_storage_entitlement SET status = #{status}, update_time = CURRENT_TIMESTAMP(3)
+        WHERE id = #{id} AND status = 'ACTIVE'
+    </update>
+
+    <update id="markProcessed">
+        UPDATE t_storage_entitlement SET expired_processed_time = #{processedTime}, update_time = CURRENT_TIMESTAMP(3)
+        WHERE id = #{id} AND status = 'EXPIRED' AND expired_processed_time IS NULL
+    </update>
+
 </mapper>

@@ -4,6 +4,8 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Duration;
+
 /**
  * MinIO配置实体
  *
@@ -39,4 +41,7 @@ public class ObsProperties {
      * 文件名称
      */
     private String bucketName;
+
+    /** 预签名下载地址有效期，默认3天。 */
+    private Duration downloadUrlTtl = Duration.ofDays(3);
 }

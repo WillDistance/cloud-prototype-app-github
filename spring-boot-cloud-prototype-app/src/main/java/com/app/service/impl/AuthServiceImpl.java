@@ -1,7 +1,7 @@
 package com.app.service.impl;
 
-import com.app.enums.*;
 import com.app.constants.RedisKeyConstants;
+import com.app.enums.*;
 import com.app.exception.AuthenticationException;
 import com.app.exception.BusinessException;
 import com.app.exception.RequestParameterException;
@@ -17,7 +17,7 @@ import com.app.pojo.vo.UserVo;
 import com.app.security.JwtTokenService;
 import com.app.security.RefreshTokenService;
 import com.app.service.AuthService;
-import com.app.support.auth.VerificationCodeSender;
+import com.app.support.notification.VerificationCodeSender;
 import com.app.utils.UserContextHolderUtil;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;

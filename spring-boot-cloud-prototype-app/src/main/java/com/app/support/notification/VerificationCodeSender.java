@@ -1,4 +1,4 @@
-package com.app.support.auth;
+package com.app.support.notification;
 
 /**
  * 验证码发送抽象，正式邮件供应商可替换实现。

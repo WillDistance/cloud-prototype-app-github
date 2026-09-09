@@ -33,3 +33,4 @@ oss:
   secretKey: minioadmin
   bucketName: ${OSS_BUCKET:yl-img-bucket}
   callback-url: ${OSS_CALLBACK_URL:}
+  download-url-ttl: ${OSS_DOWNLOAD_URL_TTL:P3D}

@@ -28,6 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Arrays;
 import java.util.Locale;
@@ -82,7 +85,8 @@ public class DeviceUploadServiceImpl extends ServiceImpl<PhotoFileMapper, PhotoF
             throw new BusinessException(ErrorCodeEnum.STORAGE_CAPACITY_INSUFFICIENT);
         }
         LocalDateTime expireTime = LocalDateTime.now().plus(UPLOAD_URL_TTL);
-        String objectKey = "original/" + binding.getUserId() + "/" + IdWorker.getId() + "." + request.getExtension().toLowerCase();
+        String fileName = IdWorker.getId() + "." + request.getExtension().toLowerCase();
+        String objectKey = binding.getUserId() + "/" + LocalDate.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_DATE) + "/" + fileName;
         PhotoFileEntity photo = new PhotoFileEntity().setId(IdWorker.getId()).setUserId(binding.getUserId()).setDeviceId(device.getId())
                 .setFileName(request.getFileName()).setExtension(request.getExtension().toLowerCase()).setMimeType(request.getMimeType())
                 .setSizeBytes(request.getSizeBytes()).setUserTimeZoneSnapshot(binding.getBindUserTimeZone())

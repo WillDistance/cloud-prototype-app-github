@@ -33,19 +33,43 @@
 
 ### 3.1 登录
 
-![登录页：邮箱、密码、登录入口](screenshots/01-login.png)
+![1788779955278](requirement-document.assets/1788779955278.png)
 
-### 3.2 相册首页
 
-![相册首页：日期筛选和按日期分组的三列缩略图](screenshots/02-album.png)
+
+### 3.2 注册
+
+![1788780084865](requirement-document.assets/1788780084865.png)
+
+![1788780053414](requirement-document.assets/1788780053414.png)
+
+![1788780070185](requirement-document.assets/1788780070185.png)
+
+
+
+### 3.2 相册首页（绑定设备与未绑定）
+
+![相册首页：日期筛选和按日期分组的三列缩略图](requirement-document.assets/1788780104558.png)
+
+![1788780155417](requirement-document.assets/1788780155417.png)
 
 ### 3.3 我的与存储空间
 
-![我的页：存储用量、最近到期提醒、设备与购买入口](screenshots/03-mine.png)
+![我的页：存储用量、最近到期提醒、设备与购买入口](requirement-document.assets/1788780172956.png)
 
-### 3.4 存储权益与到期规则
+![1788780217489](requirement-document.assets/1788780217489.png)
 
-![存储权益页：三项权益、到期日和自动清理规则](screenshots/05-entitlements.png)
+![1788780228406](requirement-document.assets/1788780228406.png)
+
+![1788780236296](requirement-document.assets/1788780236296.png)
+
+![1788780252127](requirement-document.assets/1788780252127.png)
+
+
+
+### 
+
+
 
 ### 3.5 后台能力
 

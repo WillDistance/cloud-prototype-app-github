@@ -36,4 +36,20 @@
         UPDATE t_notification SET status = #{status}, update_time = CURRENT_TIMESTAMP(3) WHERE id = #{id} AND status = #{expectedStatus}
     </update>
 
+    <select id="selectPending" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_notification
+        WHERE status IN ('PENDING', 'FAILED') AND (next_retry_time IS NULL OR next_retry_time &lt;= #{now})
+        ORDER BY create_time ASC, id ASC LIMIT 100
+    </select>
+
+    <update id="markSent">
+        UPDATE t_notification SET status = 'SENT', sent_time = #{sentTime}, update_time = CURRENT_TIMESTAMP(3)
+        WHERE id = #{id} AND status = 'SENDING'
+    </update>
+
+    <update id="markFailed">
+        UPDATE t_notification SET status = 'FAILED', failure_reason = #{reason}, next_retry_time = #{nextRetryTime}, retry_count = retry_count + 1, update_time = CURRENT_TIMESTAMP(3)
+        WHERE id = #{id} AND status = 'SENDING'
+    </update>
+
 </mapper>

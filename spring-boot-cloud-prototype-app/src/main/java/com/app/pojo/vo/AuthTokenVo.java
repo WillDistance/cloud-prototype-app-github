@@ -12,9 +12,18 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class AuthTokenVo {
+    /** Access Token。 */
     private String accessToken;
+
+    /** Refresh Token。 */
     private String refreshToken;
+
+    /** 令牌类型。 */
     private String tokenType;
+
+    /** Access Token有效期，单位为秒。 */
     private long accessTokenExpiresIn;
+
+    /** Refresh Token有效期，单位为秒。 */
     private long refreshTokenExpiresIn;
 }

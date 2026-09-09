@@ -14,28 +14,14 @@ import java.util.Locale;
  */
 public class BusinessNumberGenerator {
 
-    private static final DateTimeFormatter TIME_FORMATTER =
-            DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS").withZone(ZoneOffset.UTC);
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS").withZone(ZoneOffset.UTC);
     private static final char[] RANDOM_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
     private static final int RANDOM_LENGTH = 12;
 
-    private final Clock clock;
-    private final SecureRandom secureRandom;
+    private static final Clock clock = Clock.systemUTC();
+    private static final SecureRandom secureRandom = new SecureRandom();
 
-    public BusinessNumberGenerator() {
-        this(Clock.systemUTC());
-    }
-
-    BusinessNumberGenerator(Clock clock) {
-        this(clock, new SecureRandom());
-    }
-
-    BusinessNumberGenerator(Clock clock, SecureRandom secureRandom) {
-        this.clock = clock;
-        this.secureRandom = secureRandom;
-    }
-
-    public String generate(String prefix) {
+    public static String generate(String prefix) {
         String normalizedPrefix = normalizePrefix(prefix);
         StringBuilder number = new StringBuilder(normalizedPrefix)
                 .append(TIME_FORMATTER.format(clock.instant()));
@@ -51,7 +37,7 @@ public class BusinessNumberGenerator {
      * @param prefix 方法参数（prefix）
      * @return 处理结果
      */
-    private String normalizePrefix(String prefix) {
+    private static String normalizePrefix(String prefix) {
         if (prefix == null || prefix.isBlank()) {
             throw new IllegalArgumentException("业务编号前缀不能为空");
         }
