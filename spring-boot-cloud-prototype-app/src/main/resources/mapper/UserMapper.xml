@@ -8,4 +8,5 @@
  <update id="updateStatusById">UPDATE t_user SET status = #{status}, update_time=CURRENT_TIMESTAMP(3) WHERE id=#{id} AND status = #{expectedStatus}</update>
  <update id="updatePassword">UPDATE t_user SET password_hash=#{passwordHash}, password_update_time=CURRENT_TIMESTAMP(3), update_time=CURRENT_TIMESTAMP(3) WHERE id=#{id}</update>
  <update id="updateLastLogin">UPDATE t_user SET last_login_time=CURRENT_TIMESTAMP(3), update_time=CURRENT_TIMESTAMP(3) WHERE id=#{id}</update>
+ <update id="updatePreferredLanguage">UPDATE t_user SET preferred_language=#{preferredLanguage}, update_time=CURRENT_TIMESTAMP(3) WHERE id=#{id}</update>
 </mapper>
