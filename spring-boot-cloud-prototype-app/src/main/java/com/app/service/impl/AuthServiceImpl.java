@@ -1,6 +1,7 @@
 package com.app.service.impl;
 
 import com.app.enums.*;
+import com.app.constants.RedisKeyConstants;
 import com.app.exception.AuthenticationException;
 import com.app.exception.BusinessException;
 import com.app.exception.RequestParameterException;
@@ -81,7 +82,7 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             throw new BusinessException(ErrorCodeEnum.AUTH_INVALID_CREDENTIALS);
         }
         String key = key(email, purpose);
-        Boolean available = redis.opsForValue().setIfAbsent(key + ":cooldown", "1", SEND_INTERVAL);
+        Boolean available = redis.opsForValue().setIfAbsent(key + RedisKeyConstants.AUTH_CODE_COOLDOWN_SUFFIX, "1", SEND_INTERVAL);
         if (Boolean.FALSE.equals(available)) {
             throw new BusinessException(ErrorCodeEnum.AUTH_CODE_SEND_TOO_FREQUENT);
         }
@@ -125,8 +126,8 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
         codeMapper.markVerified(record.getId());
         redis.delete(key(email, purpose));
-        redis.delete(key(email, purpose) + ":cooldown");
-        redis.opsForValue().set(key(email, purpose) + ":verified", "1", CODE_TTL);
+        redis.delete(key(email, purpose) + RedisKeyConstants.AUTH_CODE_COOLDOWN_SUFFIX);
+        redis.opsForValue().set(key(email, purpose) + RedisKeyConstants.AUTH_CODE_VERIFIED_SUFFIX, "1", CODE_TTL);
     }
 
     @Override
@@ -198,7 +199,7 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @param purpose 验证码用途
      */
     private void consumeVerified(String email, String purpose) {
-        String k = key(email, purpose) + ":verified";
+        String k = key(email, purpose) + RedisKeyConstants.AUTH_CODE_VERIFIED_SUFFIX;
         if (!Boolean.TRUE.equals(redis.hasKey(k))) {
             throw new BusinessException(ErrorCodeEnum.AUTH_CODE_NOT_VERIFIED);
         }
@@ -223,7 +224,7 @@ public class AuthServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
      * @return 规范化后的邮箱地址
      */
     private String key(String email, String purpose) {
-        return "auth:code:" + purpose + ":" + email;
+        return RedisKeyConstants.AUTH_CODE_PREFIX + purpose + ":" + email;
     }
 
     /**
