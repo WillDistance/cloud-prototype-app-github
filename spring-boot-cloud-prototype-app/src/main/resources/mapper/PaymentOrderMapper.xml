@@ -17,6 +17,10 @@
         <result column="amount_cent" jdbcType="BIGINT" property="amountCent"/>
         <result column="currency" jdbcType="VARCHAR" property="currency"/>
         <result column="payment_channel" jdbcType="VARCHAR" property="paymentChannel"/>
+        <result column="provider_order_id" jdbcType="VARCHAR" property="providerOrderId"/>
+        <result column="provider_capture_id" jdbcType="VARCHAR" property="providerCaptureId"/>
+        <result column="payment_method" jdbcType="VARCHAR" property="paymentMethod"/>
+        <result column="checkout_url" jdbcType="VARCHAR" property="checkoutUrl"/>
         <result column="status" jdbcType="VARCHAR" property="status"/>
         <result column="expire_time" jdbcType="TIMESTAMP" property="expireTime"/>
         <result column="paid_time" jdbcType="TIMESTAMP" property="paidTime"/>
@@ -29,15 +33,58 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, order_no, user_id, storage_plan_id, plan_code_snapshot, plan_version_snapshot, plan_name_snapshot, capacity_bytes_snapshot, duration_value_snapshot, duration_unit_snapshot, amount_cent, currency, payment_channel, status, expire_time, paid_time, closed_time, client_request_id, create_by, create_time, update_by, update_time
+        id, order_no, user_id, storage_plan_id, plan_code_snapshot, plan_version_snapshot, plan_name_snapshot, capacity_bytes_snapshot, duration_value_snapshot, duration_unit_snapshot, amount_cent, currency, payment_channel, provider_order_id, provider_capture_id, payment_method, checkout_url, status, expire_time, paid_time, closed_time, client_request_id, create_by, create_time, update_by, update_time
     </sql>
 
     <select id="selectByIdForUpdate" resultMap="BaseResultMap" parameterType="long">
         SELECT <include refid="Base_Column_List"/> FROM t_payment_order WHERE id = #{id} FOR UPDATE
     </select>
 
+    <select id="selectByUserAndClientRequestId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_payment_order
+        WHERE user_id = #{userId} AND client_request_id = #{clientRequestId}
+        LIMIT 1
+    </select>
+
+    <select id="selectByUserAndOrderNo" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_payment_order
+        WHERE user_id = #{userId} AND order_no = #{orderNo}
+        LIMIT 1
+    </select>
+
+    <select id="selectByOrderNo" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_payment_order
+        WHERE order_no = #{orderNo}
+        LIMIT 1
+    </select>
+
+    <select id="selectByProviderOrderId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_payment_order
+        WHERE provider_order_id = #{providerOrderId}
+        LIMIT 1
+    </select>
+
     <update id="updateStatusById">
         UPDATE t_payment_order SET status = #{status}, update_time = CURRENT_TIMESTAMP(3) WHERE id = #{id} AND status = #{expectedStatus}
+    </update>
+
+    <update id="updateProviderOrder">
+        UPDATE t_payment_order
+        SET provider_order_id = #{providerOrderId}, checkout_url = #{checkoutUrl}, update_time = CURRENT_TIMESTAMP(3)
+        WHERE id = #{id} AND status = 'PENDING'
+    </update>
+
+    <update id="updateProviderCapture">
+        UPDATE t_payment_order
+        SET provider_capture_id = #{providerCaptureId}, update_time = CURRENT_TIMESTAMP(3)
+        WHERE id = #{id}
+    </update>
+
+    <update id="markPaid">
+        UPDATE t_payment_order
+        SET status = 'PAID', provider_capture_id = #{providerCaptureId},
+            paid_time = #{paidTime}, update_time = CURRENT_TIMESTAMP(3)
+        WHERE id = #{id} AND status = 'PENDING'
     </update>
 
 </mapper>

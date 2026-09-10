@@ -25,6 +25,20 @@ security:
   refresh-token:
     ttl: ${JWT_REFRESH_TOKEN_TTL:PT30D}
 
+payment:
+  paypal:
+    # 开发默认关闭；上线前切换为true并注入密钥管理服务中的值。
+    enabled: ${PAYPAL_ENABLED:false}
+    base-url: ${PAYPAL_BASE_URL:https://api-m.sandbox.paypal.com}
+    client-id: ${PAYPAL_CLIENT_ID:}
+    client-secret: ${PAYPAL_CLIENT_SECRET:}
+    webhook-id: ${PAYPAL_WEBHOOK_ID:}
+    brand-name: ${PAYPAL_BRAND_NAME:Cloud Album}
+    return-url: ${PAYPAL_RETURN_URL:http://localhost:5173/plans}
+    cancel-url: ${PAYPAL_CANCEL_URL:http://localhost:5173/plans}
+    order-expire-minutes: ${PAYPAL_ORDER_EXPIRE_MINUTES:30}
+    supported-currencies: ${PAYPAL_SUPPORTED_CURRENCIES:USD,EUR,GBP}
+
 
 oss:
   obsType: MinIo # HwCloudObs 或 MinIo

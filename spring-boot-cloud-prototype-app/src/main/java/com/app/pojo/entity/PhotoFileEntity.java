@@ -4,10 +4,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import java.time.LocalDateTime;
 
 /**
  * t_photo_file表实体
@@ -63,9 +62,7 @@ public class PhotoFileEntity extends BaseField {
     @TableField("object_key")
     private String objectKey;
 
-    /**
-     * 照片状态：照片状态：URL_ISSUED=已签发上传链接，ORIGINAL_UPLOADED=原图上传回调成功，PROCESSING=派生图处理中，AVAILABLE=可访问，FAILED=派生图处理失败，DELETE_PENDING=待永久删除，DELETE_FAILED=删除失败
-     */
+    /** 照片状态：照片状态：URL_ISSUED=已签发上传链接，ORIGINAL_UPLOADED=原图上传回调成功，PROCESSING=派生图处理中，AVAILABLE=可访问，FAILED=派生图处理失败，DELETE_PENDING=待永久删除，DELETE_FAILED=删除失败 */
     @TableField("status")
     private String status;
 

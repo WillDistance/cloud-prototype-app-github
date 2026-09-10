@@ -30,7 +30,7 @@ public class PaymentCallbackEntity extends BaseField {
     @TableField("order_no")
     private String orderNo;
 
-    /** 支付渠道：PINGPONG=乒乓支付 */
+    /** 支付渠道：PAYPAL=PayPal PINGPONG=乒乓支付 */
     @TableField("payment_channel")
     private String paymentChannel;
 

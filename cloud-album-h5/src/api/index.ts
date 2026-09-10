@@ -13,8 +13,10 @@ export interface AuthLogin {
 
 export interface LoginResult {
   accessToken: string
+  refreshToken: string
   tokenType: string
-  expiresIn: number
+  accessTokenExpiresIn: number
+  refreshTokenExpiresIn: number
 }
 
 export interface UserProfile {
@@ -79,8 +81,22 @@ export interface StoragePlan {
   recommended: boolean
 }
 
+export interface PaymentOrder {
+  orderNo: string
+  status: string
+  paymentChannel: string
+  paymentMethod?: string
+  amountCent: number
+  currency: string
+  providerOrderId?: string
+  checkoutUrl?: string
+  expireTime: string
+  paidTime?: string
+}
+
 export const authApi = {
   login: (data: AuthLogin) => api.post<CommonResult<LoginResult>>('/api/auth/login', data),
+  refresh: (refreshToken: string) => api.post<CommonResult<LoginResult>>('/api/auth/refresh', { refreshToken }),
   sendRegisterCode: (email: string) => api.post('/api/auth/sendRegisterCode', { email }),
   verifyRegisterCode: (email: string, code: string) => api.post('/api/auth/verifyRegisterCode', { email, code }),
   register: (data: { email: string; password: string; confirmPassword: string }, timeZone: string, language: string) =>
@@ -88,7 +104,7 @@ export const authApi = {
   sendResetPasswordCode: (email: string) => api.post('/api/auth/sendResetPasswordCode', { email }),
   verifyResetPasswordCode: (email: string, code: string) => api.post('/api/auth/verifyResetPasswordCode', { email, code }),
   resetPassword: (data: { email: string; newPassword: string; confirmPassword: string }) => api.post('/api/auth/resetPassword', data),
-  logout: () => api.post('/api/auth/logout'),
+  logout: (refreshToken: string) => api.post('/api/auth/logout', { refreshToken }),
 }
 
 export const userApi = {
@@ -105,6 +121,15 @@ export const storageApi = {
   plans: () => api.get<CommonResult<StoragePlan[]>>('/api/storagePlan/listActivePlans'),
   overview: () => api.get<CommonResult<StorageOverview>>('/api/storage/getOverview'),
   entitlements: () => api.get<CommonResult<Entitlement[]>>('/api/storage/listEntitlements'),
+}
+
+export const paymentApi = {
+  createOrder: (data: { planCode: string; planVersion: number; clientRequestId: string }) =>
+    api.post<CommonResult<PaymentOrder>>('/api/paymentOrder/createOrder', data),
+  captureOrder: (orderNo: string) =>
+    api.post<CommonResult<PaymentOrder>>('/api/paymentOrder/captureOrder', { orderNo }),
+  getOrder: (orderNo: string) =>
+    api.get<CommonResult<PaymentOrder>>('/api/paymentOrder/getOrder', { params: { orderNo } }),
 }
 
 export const photoApi = {

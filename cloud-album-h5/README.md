@@ -2,7 +2,7 @@
 
 ## 项目定位
 
-这是云相册 APP 的独立 H5 前端项目，使用 Vue 3 + Vite + TypeScript + Vant 构建，调用同级目录下 `spring-boot-cloud-prototype-app` 提供的后台 API
+这是云相册 APP 的独立 H5 前端项目，使用 Vue 3 + Vite + TypeScript + Vant 构建，调用同级目录下 `spring-boot-cloud-prototype-app` 提供的后台 API。
 
 ## 项目目录
 
@@ -92,4 +92,4 @@ http://127.0.0.1:8081/app
 - 语言偏好切换后同步调用后台 `updateLanguage`。
 - 日期显示由前端根据用户时区和当前语言格式化。
 - 删除操作明确提示不可恢复。
-- 阶段 12 支付异步回调仍等待乒乓支付正式协议，前端暂不根据支付页面回跳自行开通权益。
+- 阶段 12 支付异步回调默认使用 PayPal Checkout；前端仍不根据支付页面回跳直接开通权益。

@@ -31,6 +31,12 @@
         SELECT <include refid="Base_Column_List"/> FROM t_storage_plan WHERE id = #{id} FOR UPDATE
     </select>
 
+    <select id="selectActiveByCodeAndVersion" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_storage_plan
+        WHERE plan_code = #{planCode} AND plan_version = #{planVersion} AND status = 'ACTIVE'
+        LIMIT 1
+    </select>
+
     <update id="updateStatusById">
         UPDATE t_storage_plan SET status = #{status}, update_time = CURRENT_TIMESTAMP(3) WHERE id = #{id} AND status = #{expectedStatus}
     </update>

@@ -5,7 +5,6 @@ import com.app.enums.PhotoFileStatusEnum;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * 阶段11权益到期清理和通知契约测试。
@@ -30,6 +29,6 @@ class Phase11CleanupTest {
     void shouldKeepDeleteFailureState() {
         assertEquals("DELETE_PENDING", PhotoFileStatusEnum.DELETE_PENDING.getValue());
         assertEquals("DELETE_FAILED", PhotoFileStatusEnum.DELETE_FAILED.getValue());
-        assertFalse(java.util.Arrays.stream(PhotoFileStatusEnum.values()).anyMatch(status -> "COMPLETED".equals(status.getValue())));
+        assertEquals("DELETED", PhotoFileStatusEnum.DELETED.getValue());
     }
 }

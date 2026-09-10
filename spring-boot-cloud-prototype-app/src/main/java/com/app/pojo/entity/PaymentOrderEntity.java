@@ -62,13 +62,29 @@ public class PaymentOrderEntity extends BaseField {
     @TableField("amount_cent")
     private Long amountCent;
 
-    /** 币种：USD=美元，CNY=人民币 */
+    /** 币种，USD=美元，CNY=人民币、EUR或GBP。 */
     @TableField("currency")
     private String currency;
 
-    /** 支付渠道：PINGPONG=乒乓支付 */
+    /** 支付渠道：PAYPAL=PayPal PINGPONG=乒乓支付 */
     @TableField("payment_channel")
     private String paymentChannel;
+
+    /** 支付平台订单号。 */
+    @TableField("provider_order_id")
+    private String providerOrderId;
+
+    /** 支付平台扣款交易号。 */
+    @TableField("provider_capture_id")
+    private String providerCaptureId;
+
+    /** 支付方式：PAYPAL_WALLET或CARD。 */
+    @TableField("payment_method")
+    private String paymentMethod;
+
+    /** 支付平台托管收银台跳转地址。 */
+    @TableField("checkout_url")
+    private String checkoutUrl;
 
     /** 订单状态：PENDING=待支付，PAID=已支付，CLOSED=已关闭，FAILED=支付失败，REFUNDED=已退款 */
     @TableField("status")

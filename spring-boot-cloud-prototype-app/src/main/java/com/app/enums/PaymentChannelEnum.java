@@ -7,6 +7,7 @@ package com.app.enums;
  * @since 2026-09-09
  */
 public enum PaymentChannelEnum {
+    PAYPAL("PAYPAL", "PayPal Checkout"),
     PINGPONG("PINGPONG", "乒乓支付");
     private final String value;
 

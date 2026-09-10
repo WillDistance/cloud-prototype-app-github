@@ -44,7 +44,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         if (uri != null && uri.contains("/auth/")) {
             return "auth";
         }
-        if (uri != null && uri.contains("/ossCallback/")) {
+        if (uri != null && (uri.contains("/ossCallback/") || uri.contains("/paymentOrder/webhook/"))) {
             return "callback";
         }
         if (uri != null && uri.contains("/deviceUpload/")) {

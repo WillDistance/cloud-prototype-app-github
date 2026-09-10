@@ -34,4 +34,10 @@
         SELECT <include refid="Base_Column_List"/> FROM t_payment_callback WHERE id = #{id} FOR UPDATE
     </select>
 
+    <select id="selectByChannelAndEventId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_payment_callback
+        WHERE payment_channel = #{paymentChannel} AND callback_event_id = #{callbackEventId}
+        LIMIT 1
+    </select>
+
 </mapper>

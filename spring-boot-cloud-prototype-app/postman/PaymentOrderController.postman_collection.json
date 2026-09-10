@@ -1,0 +1,54 @@
+{
+  "info": {
+    "name": "PaymentOrderController",
+    "_postman_id": "cloud-album-paypal-checkout",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://127.0.0.1:8081/app" },
+    { "key": "accessToken", "value": "" },
+    { "key": "orderNo", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Create order",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{"planCode":"PLAN-1G-MONTH","planVersion":1,"clientRequestId":"{{$guid}}"}"
+        },
+        "url": "{{baseUrl}}/api/paymentOrder/createOrder"
+      }
+    },
+    {
+      "name": "Capture order after PayPal approval",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{"orderNo":"{{orderNo}}"}"
+        },
+        "url": "{{baseUrl}}/api/paymentOrder/captureOrder"
+      }
+    },
+    {
+      "name": "Get order",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": "{{baseUrl}}/api/paymentOrder/getOrder?orderNo={{orderNo}}"
+      }
+    }
+  ]
+}

@@ -22,6 +22,7 @@ export const useAppStore = defineStore('app', () => {
   async function login(email: string, password: string) {
     const response = await authApi.login({ email, password })
     setToken(response.data.data.accessToken)
+    localStorage.setItem('cloud_album_refresh_token', response.data.data.refreshToken)
     await refreshUser()
   }
 
@@ -48,8 +49,10 @@ export const useAppStore = defineStore('app', () => {
   }
 
   async function logout() {
-    try { if (isLoggedIn.value) await authApi.logout() } finally {
+    const refreshToken = localStorage.getItem('cloud_album_refresh_token') || ''
+    try { if (isLoggedIn.value) await authApi.logout(refreshToken) } finally {
       setToken('')
+      localStorage.removeItem('cloud_album_refresh_token')
       profile.value = null
       device.value = null
       overview.value = null

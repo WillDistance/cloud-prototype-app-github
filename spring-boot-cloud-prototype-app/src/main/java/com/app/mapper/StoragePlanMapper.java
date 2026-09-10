@@ -22,6 +22,8 @@ public interface StoragePlanMapper extends BaseMapper<StoragePlanEntity> {
      * @return 被锁定的存储套餐，不存在时返回null
      */
     StoragePlanEntity selectByIdForUpdate(Long id);
+
+    StoragePlanEntity selectActiveByCodeAndVersion(@Param("planCode") String planCode, @Param("planVersion") Integer planVersion);
     /**
      * 在存储套餐当前状态符合预期时原子更新套餐状态。
      *

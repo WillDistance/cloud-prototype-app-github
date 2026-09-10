@@ -136,7 +136,7 @@ CREATE TABLE IF NOT EXISTS `t_storage_plan` (
   UNIQUE KEY `uk_plan_code_version` (`plan_code`, `plan_version`),
   KEY `idx_plan_status_sort` (`status`, `sort_order`),
   CONSTRAINT `chk_plan_duration_unit` CHECK (`duration_unit` IN ('DAY', 'MONTH', 'YEAR')),
-  CONSTRAINT `chk_plan_currency` CHECK (`currency` IN ('CNY','USD')),
+  CONSTRAINT `chk_plan_currency` CHECK (`currency` IN ('CNY','USD','EUR','GBP')),
   CONSTRAINT `chk_plan_recommended` CHECK (`recommended` IN (0, 1)),
   CONSTRAINT `chk_plan_status` CHECK (`status` IN ('ACTIVE', 'OFF_SHELF', 'ARCHIVED'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='云存储套餐表';
@@ -158,7 +158,11 @@ CREATE TABLE IF NOT EXISTS `t_payment_order` (
   `duration_unit_snapshot` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '套餐有效期单位快照：DAY=天，MONTH=自然月，YEAR=自然年',
   `amount_cent` bigint unsigned NOT NULL COMMENT '应付金额(美元、人民币)',
   `currency` char(3) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'CNY' COMMENT '币种：USD=美元，CNY=人民币',
-  `payment_channel` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PINGPONG' COMMENT '支付渠道：PINGPONG=乒乓支付',
+  `payment_channel` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PAYPAL' COMMENT '支付渠道：PAYPAL=PayPal Checkout',
+  `provider_order_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '支付平台订单号',
+  `provider_capture_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '支付平台扣款交易号',
+  `payment_method` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '支付方式：PAYPAL_WALLET或CARD',
+  `checkout_url` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '支付平台托管收银台地址',
   `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING' COMMENT '订单状态：PENDING=待支付，PAID=已支付，CLOSED=已关闭，FAILED=支付失败，REFUNDED=已退款',
   `expire_time` datetime(3) NOT NULL COMMENT '订单支付过期时间(UTC，带毫秒)',
   `paid_time` datetime(3) DEFAULT NULL COMMENT '支付成功时间(UTC，带毫秒)',
@@ -171,11 +175,13 @@ CREATE TABLE IF NOT EXISTS `t_payment_order` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_payment_order_no` (`order_no`),
   UNIQUE KEY `uk_order_user_request` (`user_id`, `client_request_id`),
+  UNIQUE KEY `uk_order_provider_order` (`provider_order_id`),
+  UNIQUE KEY `uk_order_provider_capture` (`provider_capture_id`),
   KEY `idx_order_user_status_time` (`user_id`, `status`, `create_time`),
   KEY `idx_order_plan_id` (`storage_plan_id`),
   CONSTRAINT `chk_order_duration_unit` CHECK (`duration_unit_snapshot` IN ('DAY', 'MONTH', 'YEAR')),
-  CONSTRAINT `chk_order_currency` CHECK (`currency` IN ('CNY','USD')),
-  CONSTRAINT `chk_order_channel` CHECK (`payment_channel` = 'PINGPONG'),
+  CONSTRAINT `chk_order_currency` CHECK (`currency` IN ('CNY','USD','EUR','GBP')),
+  CONSTRAINT `chk_order_channel` CHECK (`payment_channel` IN ('PAYPAL','PINGPONG')),
   CONSTRAINT `chk_order_status` CHECK (`status` IN ('PENDING', 'PAID', 'CLOSED', 'FAILED', 'REFUNDED'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='存储套餐支付订单表';
 
@@ -183,7 +189,7 @@ CREATE TABLE IF NOT EXISTS `t_payment_callback` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `payment_order_id` bigint unsigned DEFAULT NULL COMMENT '关联订单ID，无法匹配订单时可为空',
   `order_no` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '回调中的商户订单号',
-  `payment_channel` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PINGPONG' COMMENT '支付渠道：PINGPONG=乒乓支付',
+  `payment_channel` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PAYPAL' COMMENT '支付渠道：PAYPAL=PayPal Checkout',
   `channel_transaction_no` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '支付平台交易号',
   `callback_event_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '支付平台回调事件ID',
   `raw_payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '支付回调原文',
@@ -257,7 +263,7 @@ CREATE TABLE IF NOT EXISTS `t_storage_entitlement` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户独立存储权益表';
 
 -- =========================================================
--- 6. 设备上传照片与对象存储派生文件
+-- 6. 设备上传照片与派生文件
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS `t_photo_file` (
@@ -270,9 +276,9 @@ CREATE TABLE IF NOT EXISTS `t_photo_file` (
   `size_bytes` bigint unsigned NOT NULL COMMENT '文件实际大小(字节)，用于容量计费',
   `user_time_zone_snapshot` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '上传时用户IANA时区快照',
   `upload_url_expire_time` datetime(3) NOT NULL COMMENT 'OSS临时上传链接过期时间(UTC，带毫秒)',
-  `file_type` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ORIGINAL' COMMENT '文件版本，当前仅保存原图记录：ORIGINAL=原图',
+  `file_type` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '文件版本：ORIGINAL=原图，THUMBNAIL=缩略图，PREVIEW=预览图',
   `object_key` varchar(512) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'OSS对象路径，不直接作为公网下载地址',
-  `status` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'URL_ISSUED' COMMENT '照片状态：URL_ISSUED=已签发上传链接，ORIGINAL_UPLOADED=原图上传回调成功，PROCESSING=派生图处理中，AVAILABLE=可访问，FAILED=派生图处理失败，DELETE_PENDING=待永久删除，DELETE_FAILED=删除失败；清理成功后删除数据库记录',
+  `status` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'URL_ISSUED' COMMENT '照片状态：URL_ISSUED=已签发上传链接，ORIGINAL_UPLOADED=原图上传回调成功，PROCESSING=派生图处理中，COMPLETED=处理完成，AVAILABLE=可访问，FAILED=处理失败，DELETE_PENDING=待永久删除，DELETE_FAILED=删除失败',
   `delete_reason` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '删除原因：未删除时为空；USER_MANUAL=用户主动删除，ENTITLEMENT_EXPIRED=权益到期自动清理',
   `uploaded_time` datetime(3) NOT NULL COMMENT '原图上传回调成功时间(UTC，带毫秒)，相册排序及清理依据',
   `create_by` bigint unsigned DEFAULT NULL COMMENT '创建人用户ID',
@@ -282,10 +288,10 @@ CREATE TABLE IF NOT EXISTS `t_photo_file` (
   PRIMARY KEY (`id`),
   KEY `idx_uploaded_time` (`uploaded_time`) USING BTREE,
   UNIQUE KEY `uk_photo_file_object_key` (`object_key`),
-  CONSTRAINT `chk_photo_file_type` CHECK (`file_type` = 'ORIGINAL'),
-  CONSTRAINT `chk_photo_file_status` CHECK (`status` IN ('URL_ISSUED', 'AVAILABLE', 'DELETE_PENDING', 'DELETE_FAILED')),
+  CONSTRAINT `chk_photo_file_type` CHECK (`file_type` IN ('ORIGINAL', 'THUMBNAIL', 'PREVIEW')),
+  CONSTRAINT `chk_photo_file_status` CHECK (`status` IN ('URL_ISSUED','ORIGINAL_UPLOADED','PROCESSING','COMPLETED','AVAILABLE', 'DELETE_PENDING', 'DELETE_FAILED', 'DELETED')),
   CONSTRAINT `chk_photo_file_delete_reason` CHECK (`delete_reason` IS NULL OR `delete_reason` IN ('USER_MANUAL', 'ENTITLEMENT_EXPIRED'))
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='上传照片原图记录，缩略图和预览图仅存储于对象存储';
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='上传照片记录，原图及派生文件表';
 
 -- =========================================================
 -- =========================================================

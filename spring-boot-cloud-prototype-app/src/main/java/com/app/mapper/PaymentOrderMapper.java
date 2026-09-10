@@ -26,6 +26,14 @@ public interface PaymentOrderMapper extends BaseMapper<PaymentOrderEntity> {
      * @return 数据库查询结果
      */
     PaymentOrderEntity selectByIdForUpdate(Long id);
+
+    PaymentOrderEntity selectByUserAndClientRequestId(@Param("userId") Long userId, @Param("clientRequestId") String clientRequestId);
+
+    PaymentOrderEntity selectByUserAndOrderNo(@Param("userId") Long userId, @Param("orderNo") String orderNo);
+
+    PaymentOrderEntity selectByOrderNo(@Param("orderNo") String orderNo);
+
+    PaymentOrderEntity selectByProviderOrderId(@Param("providerOrderId") String providerOrderId);
     /**
      * 在期望状态匹配时原子更新记录状态。
      *
@@ -43,4 +51,12 @@ public interface PaymentOrderMapper extends BaseMapper<PaymentOrderEntity> {
      * @return 受影响的记录数
      */
     int updateStatusById(@Param("id") Long id, @Param("status") String status, @Param("expectedStatus") String expectedStatus);
+
+    int updateProviderOrder(@Param("id") Long id, @Param("providerOrderId") String providerOrderId,
+                            @Param("checkoutUrl") String checkoutUrl);
+
+    int updateProviderCapture(@Param("id") Long id, @Param("providerCaptureId") String providerCaptureId);
+
+    int markPaid(@Param("id") Long id, @Param("providerCaptureId") String providerCaptureId,
+                 @Param("paidTime") java.time.LocalDateTime paidTime);
 }

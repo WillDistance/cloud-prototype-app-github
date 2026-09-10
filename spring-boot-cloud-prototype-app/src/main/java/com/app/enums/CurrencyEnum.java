@@ -8,7 +8,9 @@ package com.app.enums;
  */
 public enum CurrencyEnum {
     CNY("CNY", "人民币"),
-    USD("USD", "美元");
+    USD("USD", "美元"),
+    EUR("EUR", "欧元"),
+    GBP("GBP", "英镑");
     private final String value;
 
     /** 枚举中文名称 */
