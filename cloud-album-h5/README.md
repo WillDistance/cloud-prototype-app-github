@@ -2,7 +2,7 @@
 
 ## 项目定位
 
-这是云相册 APP 的独立 H5 前端项目，使用 Vue 3 + Vite + TypeScript + Vant 构建，调用同级目录下 `spring-boot-cloud-prototype-app` 提供的后台 API。
+这是云相册 APP 的独立 H5 前端项目，使用 Vue 3 + Vite + TypeScript + Vant 构建，调用同级目录下 `spring-boot-cloud-prototype-app` 提供的后台 API
 
 ## 项目目录
 
