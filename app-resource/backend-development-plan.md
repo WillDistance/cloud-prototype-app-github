@@ -140,26 +140,21 @@
 - `t_photo`
 - `t_photo_file`
 
-上传会话状态建议保持：
+照片文件状态保持：
 
 ```text
 URL_ISSUED
-→ ORIGINAL_UPLOADED
-→ PROCESSING
-→ COMPLETED
 → AVAILABLE
 ```
 
-异常状态：
+删除异常状态：
 
 ```text
-EXPIRED
-FAILED
 DELETE_PENDING
 DELETE_FAILED
 ```
 
-只有原图、缩略图和预览图均上传成功，并且对应文件记录写入数据库后，照片才能进入 `AVAILABLE` 并被 H5 查询。
+原图上传校验通过、缩略图和预览图生成并上传成功后，原图记录进入 `AVAILABLE` 并被 H5 查询；缩略图和预览图仅保存于对象存储，不写入数据库。
 
 ---
 

@@ -78,14 +78,6 @@ public interface PhotoFileMapper extends BaseMapper<PhotoFileEntity> {
      */
     List<PhotoFileEntity> selectAvailableOriginals(@Param("userId") Long userId);
 
-    /**
-     * 查询同一照片的完整文件组。
-     *
-     * @param userId 用户ID
-     * @param objectKey 原图对象路径
-     * @return 原图、缩略图和预览图记录
-     */
-    List<PhotoFileEntity> selectPhotoGroup(@Param("userId") Long userId, @Param("objectKey") String objectKey);
 
     /**
      * 更新照片删除状态和删除原因。

@@ -47,6 +47,6 @@ public class OssCallbackServiceImpl extends ServiceImpl<PhotoFileMapper, PhotoFi
         if (metadata == null || metadata.getSize() != photo.getSizeBytes() || !photo.getMimeType().equalsIgnoreCase(metadata.getContentType())) {
             throw new OssCallbackRejectedException(ErrorCodeEnum.PHOTO_FILE_INVALID);
         }
-        uploadFileScanTask.processPendingPhoto(photo);
+        uploadFileScanTask.handleSinglePendingPhoto(photo);
     }
 }

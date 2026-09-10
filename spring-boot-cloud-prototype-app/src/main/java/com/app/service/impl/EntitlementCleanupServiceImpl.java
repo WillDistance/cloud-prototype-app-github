@@ -14,8 +14,6 @@ import com.app.pojo.entity.UserEntity;
 import com.app.pojo.entity.UserStorageAccountEntity;
 import com.app.service.EntitlementCleanupService;
 import com.app.service.NotificationService;
-
-
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,31 +57,25 @@ public class EntitlementCleanupServiceImpl extends ServiceImpl<StorageEntitlemen
         long capacity = entitlementMapper.sumActiveCapacity(entitlement.getUserId(), LocalDateTime.now());
         sendNotification(entitlement.getUserId(), NotificationTypeEnum.CLEANUP_STARTED, "存储空间清理开始");
         List<PhotoFileEntity> photos = photoFileMapper.selectAvailableOriginals(entitlement.getUserId());
+        long remainingUsedBytes = account.getUsedBytes();
         for (PhotoFileEntity photo : photos) {
-            if (account.getUsedBytes() <= capacity) {
+            if (remainingUsedBytes <= capacity) {
                 break;
             }
             deletePhotoGroup(photo);
+            remainingUsedBytes = Math.max(0L, remainingUsedBytes - photo.getSizeBytes());
         }
         entitlementMapper.markProcessed(entitlement.getId(), LocalDateTime.now());
         sendNotification(entitlement.getUserId(), NotificationTypeEnum.CLEANUP_COMPLETED, "存储空间清理完成");
     }
 
     /**
-     * 将照片文件组标记为待删除，实际对象删除由上传扫描定时任务异步执行。
+     * 将原图记录标记为待删除，实际对象删除由上传扫描定时任务异步执行。
      *
      * @param original 照片原图记录
-     * @return 是否成功标记完整文件组
      */
-    private boolean deletePhotoGroup(PhotoFileEntity original) {
-        List<PhotoFileEntity> group = photoFileMapper.selectPhotoGroup(original.getUserId(), original.getObjectKey());
-        if (group.isEmpty()) {
-            return false;
-        }
-        for (PhotoFileEntity file : group) {
-            photoFileMapper.updateDeleteStatus(file.getId(), PhotoFileStatusEnum.DELETE_PENDING.getValue(), DeleteReasonEnum.ENTITLEMENT_EXPIRED.getValue());
-        }
-        return true;
+    private void deletePhotoGroup(PhotoFileEntity original) {
+        photoFileMapper.updateDeleteStatus(original.getId(), PhotoFileStatusEnum.DELETE_PENDING.getValue(), DeleteReasonEnum.ENTITLEMENT_EXPIRED.getValue());
     }
 
     /**

@@ -257,7 +257,7 @@ CREATE TABLE IF NOT EXISTS `t_storage_entitlement` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户独立存储权益表';
 
 -- =========================================================
--- 6. 设备上传照片与派生文件
+-- 6. 设备上传照片与对象存储派生文件
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS `t_photo_file` (
@@ -270,9 +270,9 @@ CREATE TABLE IF NOT EXISTS `t_photo_file` (
   `size_bytes` bigint unsigned NOT NULL COMMENT '文件实际大小(字节)，用于容量计费',
   `user_time_zone_snapshot` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '上传时用户IANA时区快照',
   `upload_url_expire_time` datetime(3) NOT NULL COMMENT 'OSS临时上传链接过期时间(UTC，带毫秒)',
-  `file_type` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '文件版本：ORIGINAL=原图，THUMBNAIL=缩略图，PREVIEW=预览图',
+  `file_type` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ORIGINAL' COMMENT '文件版本，当前仅保存原图记录：ORIGINAL=原图',
   `object_key` varchar(512) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'OSS对象路径，不直接作为公网下载地址',
-  `status` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'URL_ISSUED' COMMENT '照片状态：URL_ISSUED=已签发上传链接，ORIGINAL_UPLOADED=原图上传回调成功，PROCESSING=派生图处理中，COMPLETED=处理完成，AVAILABLE=可访问，FAILED=处理失败，DELETE_PENDING=待永久删除，DELETE_FAILED=删除失败',
+  `status` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'URL_ISSUED' COMMENT '照片状态：URL_ISSUED=已签发上传链接，ORIGINAL_UPLOADED=原图上传回调成功，PROCESSING=派生图处理中，AVAILABLE=可访问，FAILED=派生图处理失败，DELETE_PENDING=待永久删除，DELETE_FAILED=删除失败；清理成功后删除数据库记录',
   `delete_reason` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '删除原因：未删除时为空；USER_MANUAL=用户主动删除，ENTITLEMENT_EXPIRED=权益到期自动清理',
   `uploaded_time` datetime(3) NOT NULL COMMENT '原图上传回调成功时间(UTC，带毫秒)，相册排序及清理依据',
   `create_by` bigint unsigned DEFAULT NULL COMMENT '创建人用户ID',
@@ -282,10 +282,10 @@ CREATE TABLE IF NOT EXISTS `t_photo_file` (
   PRIMARY KEY (`id`),
   KEY `idx_uploaded_time` (`uploaded_time`) USING BTREE,
   UNIQUE KEY `uk_photo_file_object_key` (`object_key`),
-  CONSTRAINT `chk_photo_file_type` CHECK (`file_type` IN ('ORIGINAL', 'THUMBNAIL', 'PREVIEW')),
-  CONSTRAINT `chk_photo_file_status` CHECK (`status` IN ('URL_ISSUED','ORIGINAL_UPLOADED','PROCESSING','COMPLETED','AVAILABLE', 'DELETE_PENDING', 'DELETE_FAILED', 'DELETED')),
+  CONSTRAINT `chk_photo_file_type` CHECK (`file_type` = 'ORIGINAL'),
+  CONSTRAINT `chk_photo_file_status` CHECK (`status` IN ('URL_ISSUED', 'AVAILABLE', 'DELETE_PENDING', 'DELETE_FAILED')),
   CONSTRAINT `chk_photo_file_delete_reason` CHECK (`delete_reason` IS NULL OR `delete_reason` IN ('USER_MANUAL', 'ENTITLEMENT_EXPIRED'))
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='上传照片记录，原图及派生文件表';
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='上传照片原图记录，缩略图和预览图仅存储于对象存储';
 
 -- =========================================================
 -- =========================================================

@@ -67,15 +67,6 @@
         ORDER BY uploaded_time ASC, id ASC
     </select>
 
-    <select id="selectPhotoGroup" resultMap="BaseResultMap">
-        SELECT <include refid="Base_Column_List"/> FROM t_photo_file
-        WHERE user_id = #{userId}
-          AND object_key IN (
-              #{objectKey},
-              CONCAT(SUBSTRING_INDEX(#{objectKey}, '/', 2), '/thumbnail/', SUBSTRING_INDEX(#{objectKey}, '/', -1)),
-              CONCAT(SUBSTRING_INDEX(#{objectKey}, '/', 2), '/preview/', SUBSTRING_INDEX(#{objectKey}, '/', -1))
-          )
-    </select>
 
     <update id="updateDeleteStatus">
         UPDATE t_photo_file SET status = #{status}, delete_reason = #{reason}, update_time = CURRENT_TIMESTAMP(3)

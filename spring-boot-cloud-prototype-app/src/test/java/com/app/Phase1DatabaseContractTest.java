@@ -71,7 +71,7 @@ class Phase1DatabaseContractTest {
         assertEquals(List.of("ACTIVE", "LOCKED", "DISABLED"), enumNames(com.app.enums.UserStatusEnum.class));
         assertEquals(List.of("REGISTER", "RESET_PASSWORD"), enumNames(com.app.enums.VerificationPurposeEnum.class));
         assertEquals(List.of("UNBOUND", "BOUND", "DISABLED"), enumNames(com.app.enums.DeviceStatusEnum.class));
-        assertEquals(List.of("ORIGINAL", "THUMBNAIL", "PREVIEW"), enumNames(com.app.enums.PhotoFileTypeEnum.class));
+        assertEquals(List.of("ORIGINAL"), enumNames(com.app.enums.PhotoFileTypeEnum.class));
     }
 
     private List<String> enumNames(Class<? extends Enum<?>> type) {

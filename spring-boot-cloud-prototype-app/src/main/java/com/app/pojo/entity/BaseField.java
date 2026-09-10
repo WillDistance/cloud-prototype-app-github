@@ -36,4 +36,16 @@ public class BaseField {
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
+
+    public BaseField setCreateUpdateUserId(Long userId) {
+        this.createBy = userId;
+        this.updateBy = userId;
+        return this;
+    }
+
+    public BaseField setCreateUpdateDate(LocalDateTime date) {
+        this.createTime = date;
+        this.updateTime = date;
+        return this;
+    }
 }

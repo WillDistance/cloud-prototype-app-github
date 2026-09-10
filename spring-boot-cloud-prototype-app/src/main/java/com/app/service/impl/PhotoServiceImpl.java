@@ -1,14 +1,9 @@
 package com.app.service.impl;
 
-import com.app.enums.ErrorCodeEnum;
 import com.app.constants.RedisKeyConstants;
-import com.app.enums.DeleteReasonEnum;
-import com.app.enums.PhotoFileStatusEnum;
-import com.app.enums.PhotoFileTypeEnum;
-import com.app.enums.PhotoRangeEnum;
+import com.app.enums.*;
 import com.app.exception.BusinessException;
 import com.app.mapper.PhotoFileMapper;
-
 import com.app.pojo.dto.DeletePhotosRequest;
 import com.app.pojo.dto.PhotoDetailRequest;
 import com.app.pojo.dto.PhotoListRequest;
@@ -24,8 +19,9 @@ import com.app.support.oss.ObsProperties;
 import com.app.utils.UserContextHolderUtil;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
@@ -127,7 +123,12 @@ public class PhotoServiceImpl extends ServiceImpl<PhotoFileMapper, PhotoFileEnti
      * @param objectKey 原图对象路径
      */
     private void evictDownloadUrl(String objectKey) {
-        redis.delete(RedisKeyConstants.OBJECT_DOWNLOAD_URL_PREFIX + objectKey);
+        String fileName = objectKey.substring(objectKey.lastIndexOf('/') + 1);
+        String baseDir = objectKey.substring(0, objectKey.lastIndexOf('/') + 1);
+        List<String> objectKeys = List.of(objectKey, baseDir + "thumbnail/" + fileName, baseDir + "preview/" + fileName);
+        for (String key : objectKeys) {
+            redis.delete(RedisKeyConstants.OBJECT_DOWNLOAD_URL_PREFIX + key);
+        }
     }
 
 

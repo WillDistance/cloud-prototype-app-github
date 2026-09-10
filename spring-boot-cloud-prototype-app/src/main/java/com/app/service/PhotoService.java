@@ -41,7 +41,7 @@ public interface PhotoService extends IService<PhotoFileEntity> {
     PhotoDownloadVo getOriginalDownloadUrl(PhotoDetailRequest request);
 
     /**
-     * 删除当前用户指定的照片文件组并释放原图容量。
+     * 将当前用户指定的原图记录标记为待删除，由定时任务删除对象存储文件并释放容量。
      *
      * @param request 批量删除请求
      */

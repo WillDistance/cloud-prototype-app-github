@@ -1,7 +1,5 @@
 package com.app.support.oss.minio;
 
-import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileTypeUtil;
 import com.app.enums.ErrorCodeEnum;
 import com.app.exception.OssException;
@@ -22,7 +20,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -109,7 +106,6 @@ public class MinioObsServiceImpl implements ObsFileService {
     @Override
     public String putObject(String bucketName, String fileName, MultipartFile multipartFile) {
         // 获取文件名
-        fileName = DateUtil.format(LocalDateTime.now(), DatePattern.PURE_DATE_PATTERN) + "/" + fileName;
         try (InputStream in = multipartFile.getInputStream()) {
             /**
              * 设置要上传的流。
@@ -135,7 +131,6 @@ public class MinioObsServiceImpl implements ObsFileService {
     public String putObject(String bucketName, String fileName, File file) {
         // 获取文件名
         String contentType = ContentTypeConstants.CONTENT_TYPE_MAP.get(FileTypeUtil.getType(file).toLowerCase(Locale.ROOT));
-        fileName = DateUtil.format(LocalDateTime.now(), DatePattern.PURE_DATE_PATTERN) + "/" + fileName;
         try (InputStream inputStream = new FileInputStream(file)) {
             /**
              * 设置要上传的流。
@@ -159,8 +154,6 @@ public class MinioObsServiceImpl implements ObsFileService {
     @Override
     public String putObjectByte(String bucketName, String fileName, byte[] fileByte) {
         String contentType = ContentTypeConstants.CONTENT_TYPE_MAP.get(fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase(Locale.ROOT));
-        // 获取文件名
-        fileName = DateUtil.format(LocalDateTime.now(), DatePattern.PURE_DATE_PATTERN) + "/" + fileName;
         try (ByteArrayInputStream in = new ByteArrayInputStream(fileByte)) {
             PutObjectArgs putObjectArgs = PutObjectArgs.builder().bucket(bucketName).object(fileName)
                     /**
